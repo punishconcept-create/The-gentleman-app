@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gentleman-pwa-v1';
+const CACHE_NAME = 'gentleman-launcher-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -17,7 +17,11 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
@@ -25,6 +29,8 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  // La PWA ne tente surtout pas de mettre Apps Script en cache/proxy.
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
@@ -34,6 +40,10 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         return response;
       })
-      .catch(() => caches.match(event.request).then(r => r || caches.match('./index.html')))
+      .catch(() =>
+        caches.match(event.request).then(
+          cached => cached || caches.match('./index.html')
+        )
+      )
   );
 });

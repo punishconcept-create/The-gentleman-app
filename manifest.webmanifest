@@ -1,12 +1,18 @@
 {
+  "id": "./",
   "name": "The Gentleman",
   "short_name": "Gentleman",
+  "description": "Accès à l'administration The Gentleman Card",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#0b0906",
   "theme_color": "#0b0906",
-  "description": "Administration The Gentleman Card",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "./icon-192.png",

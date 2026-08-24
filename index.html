@@ -4,95 +4,193 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0906">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="The Gentleman">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <title>The Gentleman</title>
+
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; height: 100%; background: #0b0906; }
-    body { font-family: Arial, Helvetica, sans-serif; overflow: hidden; color: #f2e9d9; }
-    .app {
-      position: fixed; inset: 0; display: flex; flex-direction: column;
-      background: radial-gradient(circle at top right, rgba(190,132,45,.14), transparent 30%),
-                  linear-gradient(145deg, #030303, #0b0906 70%, #171006);
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #0b0906;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #f2e9d9;
     }
-    .splash {
-      position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 12px; background: #0b0906;
-      transition: opacity .3s ease;
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(circle at 80% 5%, rgba(193,135,49,.18), transparent 32%),
+        radial-gradient(circle at 10% 95%, rgba(151,95,24,.14), transparent 30%),
+        linear-gradient(145deg,#020202,#0b0906 62%,#171006);
     }
-    .splash.hide { opacity: 0; pointer-events: none; }
-    .mark {
-      width: 88px; height: 88px; border-radius: 24px; display: grid; place-items: center;
-      border: 2px solid #a87329; font-family: Georgia, serif; font-size: 42px; font-weight: 700;
-      color: #d7aa5b; background: linear-gradient(155deg, #070707, #120e08);
-      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+
+    .panel {
+      width: min(92vw, 520px);
+      padding: 36px 24px 30px;
+      text-align: center;
+      border: 2px solid #a87329;
+      border-radius: 26px;
+      background: linear-gradient(155deg,#070707,#120e08 72%,#0a0704);
+      box-shadow: 0 20px 60px rgba(0,0,0,.55);
     }
-    .title { font-family: Georgia, serif; font-size: 30px; color: #d7aa5b; }
-    .subtitle { color: #bcae97; font-size: 14px; }
-    iframe { width: 100%; height: 100%; border: 0; flex: 1; background: #0b0906; }
+
+    .hat {
+      font-size: 54px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .the {
+      color: #d1a85e;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 14px;
+      letter-spacing: 8px;
+    }
+
+    .brand {
+      margin-top: 3px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(36px, 11vw, 54px);
+      font-weight: 500;
+      color: #d5a752;
+      line-height: .95;
+    }
+
+    .tagline {
+      margin-top: 10px;
+      color: #c89b54;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+
+    .line {
+      width: 68%;
+      height: 1px;
+      margin: 25px auto;
+      background: linear-gradient(90deg,transparent,#9d6c28,transparent);
+    }
+
+    .status {
+      color: #c9baa3;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .loader {
+      width: 34px;
+      height: 34px;
+      margin: 22px auto;
+      border: 3px solid rgba(205,161,87,.22);
+      border-top-color: #d4a54f;
+      border-radius: 50%;
+      animation: spin .85s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .open {
+      width: 100%;
+      min-height: 62px;
+      margin-top: 8px;
+      border: 0;
+      border-radius: 15px;
+      background: linear-gradient(#e2b963,#a86d22);
+      color: #140d05;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .small {
+      margin-top: 15px;
+      color: #7f7463;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
     .offline {
-      display: none; position: absolute; inset: 0; z-index: 20; align-items: center;
-      justify-content: center; padding: 28px; text-align: center; background: #0b0906;
-    }
-    .offline.show { display: flex; }
-    .offlineBox {
-      max-width: 420px; border: 1px solid #8c6126; border-radius: 18px; padding: 24px;
-      background: #120e08;
-    }
-    .offlineBox h2 { color: #d7aa5b; margin-top: 0; }
-    .offlineBox button {
-      min-height: 48px; padding: 0 18px; border: 0; border-radius: 12px;
-      background: linear-gradient(#dfb45e, #a66d23); font-weight: 800;
+      color: #e4aa95;
     }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div id="splash" class="splash">
-      <div class="mark">G</div>
-      <div class="title">THE GENTLEMAN</div>
-      <div class="subtitle">Ouverture de l’administration…</div>
+  <main class="panel">
+    <div class="hat">🎩</div>
+    <div class="the">THE</div>
+    <div class="brand">GENTLEMAN</div>
+    <div class="tagline">L'élégance à la caribéenne.</div>
+
+    <div class="line"></div>
+
+    <div id="status" class="status">
+      Ouverture de l’administration…
     </div>
 
-    <iframe
-      id="appFrame"
-      src="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin"
-      allow="camera; microphone; clipboard-read; clipboard-write"
-      referrerpolicy="no-referrer-when-downgrade"
-    ></iframe>
+    <div id="loader" class="loader"></div>
 
-    <div id="offline" class="offline">
-      <div class="offlineBox">
-        <h2>Connexion requise</h2>
-        <p>L’administration Gentleman Card utilise Google Apps Script et nécessite Internet.</p>
-        <button onclick="location.reload()">RÉESSAYER</button>
-      </div>
+    <button id="openBtn" class="open" type="button">
+      OUVRIR L’ADMINISTRATION
+    </button>
+
+    <div class="small">
+      Cette application ouvre directement ton administration sécurisée Google Apps Script.
     </div>
-  </div>
+  </main>
 
   <script>
-    const splash = document.getElementById('splash');
-    const frame = document.getElementById('appFrame');
-    const offline = document.getElementById('offline');
+    const ADMIN_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin";
+    const statusEl = document.getElementById('status');
+    const loaderEl = document.getElementById('loader');
+    const openBtn = document.getElementById('openBtn');
 
-    frame.addEventListener('load', () => {
-      setTimeout(() => splash.classList.add('hide'), 250);
+    function openAdmin() {
+      if (!navigator.onLine) {
+        statusEl.textContent = "Connexion Internet requise.";
+        statusEl.classList.add("offline");
+        loaderEl.style.display = "none";
+        return;
+      }
+
+      statusEl.textContent = "Ouverture de l’administration…";
+      statusEl.classList.remove("offline");
+      loaderEl.style.display = "block";
+
+      // IMPORTANT : aucune iframe.
+      // Navigation directe vers Google Apps Script.
+      window.location.href = ADMIN_URL;
+    }
+
+    openBtn.addEventListener('click', openAdmin);
+
+    // Lance automatiquement l'admin quand l'app est ouverte.
+    window.addEventListener('load', () => {
+      setTimeout(openAdmin, 650);
     });
 
-    function updateOnlineState() {
-      offline.classList.toggle('show', !navigator.onLine);
-    }
-    window.addEventListener('online', updateOnlineState);
-    window.addEventListener('offline', updateOnlineState);
-    updateOnlineState();
+    window.addEventListener('offline', () => {
+      statusEl.textContent = "Connexion Internet requise.";
+      statusEl.classList.add("offline");
+      loaderEl.style.display = "none";
+    });
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(console.error);
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
   </script>
