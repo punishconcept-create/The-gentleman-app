@@ -1,36 +1,42 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080603">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>The Gentleman</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh;min-height:100dvh;padding:22px 18px;display:grid;place-items:center;
-background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
-linear-gradient(150deg,#020202,#090704 70%,#171006)}
-.app{width:min(94vw,560px);border:2px solid #9b6728;border-radius:28px;padding:30px 22px 25px;
-background:linear-gradient(155deg,#070707,#100c07 72%,#090603);box-shadow:0 20px 60px #0009}
-.logo{text-align:center} .hat{font-size:50px} .the{font:13px Georgia,serif;letter-spacing:8px;color:#cda45e}
-h1{font:500 clamp(37px,11vw,56px) Georgia,serif;color:#d3a554;margin:3px 0 5px;line-height:1}
-.tag{font:italic 18px Georgia,serif;color:#bd914d}
-.rule{height:1px;margin:23px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
-.welcome{text-align:center;color:#a99a84;font-size:14px;margin:0 0 20px}
-.grid{display:grid;gap:13px}
-.btn{display:flex;align-items:center;gap:15px;width:100%;min-height:78px;padding:14px 18px;border-radius:17px;
-text-decoration:none;border:1px solid #68461d;background:#15110c;color:#e1bf82;box-shadow:inset 0 0 0 1px #000}
-.btn.primary{background:linear-gradient(#dfb35d,#a76b20);color:#160e05;border-color:#dfb35d}
-.ico{font-size:29px;width:38px;text-align:center} .txt{text-align:left} .ttl{font-weight:900;font-size:17px}
-.sub{font-size:12px;margin-top:4px;opacity:.7;font-weight:500}
-.foot{text-align:center;color:#695f51;font-size:11px;margin-top:22px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080603">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Gentleman</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
+    body{
+      min-height:100vh;min-height:100dvh;padding:22px 18px;display:grid;place-items:center;
+      background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+                 linear-gradient(150deg,#020202,#090704 70%,#171006)
+    }
+    .app{
+      width:min(94vw,560px);border:2px solid #9b6728;border-radius:28px;padding:30px 22px 25px;
+      background:linear-gradient(155deg,#070707,#100c07 72%,#090603);box-shadow:0 20px 60px #0009
+    }
+    .logo{text-align:center} .hat{font-size:50px} .the{font:13px Georgia,serif;letter-spacing:8px;color:#cda45e}
+    h1{font:500 clamp(37px,11vw,56px) Georgia,serif;color:#d3a554;margin:3px 0 5px;line-height:1}
+    .tag{font:italic 18px Georgia,serif;color:#bd914d}
+    .rule{height:1px;margin:23px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
+    .welcome{text-align:center;color:#a99a84;font-size:14px;margin:0 0 20px}
+    .grid{display:grid;gap:13px}
+    .btn{
+      display:flex;align-items:center;gap:15px;width:100%;min-height:78px;padding:14px 18px;border-radius:17px;
+      text-decoration:none;border:1px solid #68461d;background:#15110c;color:#e1bf82;box-shadow:inset 0 0 0 1px #000
+    }
+    .btn.primary{background:linear-gradient(#dfb35d,#a76b20);color:#160e05;border-color:#dfb35d}
+    .ico{font-size:29px;width:38px;text-align:center} .txt{text-align:left} .ttl{font-weight:900;font-size:17px}
+    .sub{font-size:12px;margin-top:4px;opacity:.7;font-weight:500}
+    .foot{text-align:center;color:#695f51;font-size:11px;margin-top:22px}
+  </style>
 </head>
 <body>
 <main class="app">
@@ -47,8 +53,8 @@ text-decoration:none;border:1px solid #68461d;background:#15110c;color:#e1bf82;b
     <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/manage">
       <span class="ico">👥</span><span class="txt"><div class="ttl">GÉRER LES CARTES</div><div class="sub">Activation, événement et réactivation</div></span>
     </a>
-    <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/scanner">
-      <span class="ico">📷</span><span class="txt"><div class="ttl">SCANNER UNE CARTE</div><div class="sub">Contrôle du QR Code au bar</div></span>
+    <a class="btn" href="./scanner.html">
+      <span class="ico">📷</span><span class="txt"><div class="ttl">SCANNER UNE CARTE</div><div class="sub">Scanner intégré directement à l'application</div></span>
     </a>
     <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin">
       <span class="ico">⚙️</span><span class="txt"><div class="ttl">ADMINISTRATION</div><div class="sub">Accès complet</div></span>
@@ -57,6 +63,9 @@ text-decoration:none;border:1px solid #68461d;background:#15110c;color:#e1bf82;b
   <div class="foot">THE GENTLEMAN • PUNISH CONCEPT</div>
 </main>
 <script>
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}
 </script>
-</body></html>
+</body>
+</html>

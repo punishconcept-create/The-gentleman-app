@@ -2,6 +2,7 @@
   "id": "/The-gentleman-app/",
   "name": "The Gentleman",
   "short_name": "Gentleman",
+  "description": "Application The Gentleman Card",
   "start_url": "/The-gentleman-app/",
   "scope": "/The-gentleman-app/",
   "display": "standalone",
