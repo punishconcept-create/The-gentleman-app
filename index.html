@@ -26,47 +26,40 @@
     body {
       min-height: 100vh;
       min-height: 100dvh;
+      padding: 20px;
       display: grid;
       place-items: center;
-      padding: 22px;
       background:
-        radial-gradient(circle at 80% 5%, rgba(193,135,49,.18), transparent 32%),
-        radial-gradient(circle at 10% 95%, rgba(151,95,24,.14), transparent 30%),
-        linear-gradient(145deg,#020202,#0b0906 62%,#171006);
+        radial-gradient(circle at 85% 5%, rgba(194,136,50,.18), transparent 32%),
+        radial-gradient(circle at 8% 92%, rgba(141,88,22,.13), transparent 30%),
+        linear-gradient(145deg, #020202, #0b0906 65%, #171006);
     }
 
     .panel {
-      width: min(92vw, 520px);
-      padding: 36px 24px 30px;
-      text-align: center;
+      width: min(92vw, 540px);
+      padding: 36px 24px 28px;
       border: 2px solid #a87329;
       border-radius: 26px;
-      background: linear-gradient(155deg,#070707,#120e08 72%,#0a0704);
+      text-align: center;
+      background: linear-gradient(155deg,#070707,#120e08 70%,#0a0704);
       box-shadow: 0 20px 60px rgba(0,0,0,.55);
     }
 
-    .hat {
-      font-size: 54px;
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-
+    .hat { font-size: 56px; line-height: 1; margin-bottom: 8px; }
     .the {
       color: #d1a85e;
       font-family: Georgia, "Times New Roman", serif;
       font-size: 14px;
       letter-spacing: 8px;
     }
-
     .brand {
       margin-top: 3px;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(36px, 11vw, 54px);
+      font-size: clamp(38px, 11vw, 56px);
       font-weight: 500;
-      color: #d5a752;
-      line-height: .95;
+      color: #d7aa5b;
+      line-height: .96;
     }
-
     .tagline {
       margin-top: 10px;
       color: #c89b54;
@@ -74,56 +67,73 @@
       font-size: 18px;
       font-style: italic;
     }
-
     .line {
       width: 68%;
       height: 1px;
       margin: 25px auto;
-      background: linear-gradient(90deg,transparent,#9d6c28,transparent);
+      background: linear-gradient(90deg, transparent, #9d6c28, transparent);
     }
 
-    .status {
-      color: #c9baa3;
-      font-size: 16px;
-      line-height: 1.45;
+    .intro {
+      margin: 0 auto 18px;
+      max-width: 390px;
+      color: #c4b59f;
+      font-size: 15px;
+      line-height: 1.55;
     }
 
-    .loader {
-      width: 34px;
-      height: 34px;
-      margin: 22px auto;
-      border: 3px solid rgba(205,161,87,.22);
-      border-top-color: #d4a54f;
-      border-radius: 50%;
-      animation: spin .85s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .open {
+    button {
       width: 100%;
       min-height: 62px;
-      margin-top: 8px;
-      border: 0;
+      margin-top: 12px;
       border-radius: 15px;
-      background: linear-gradient(#e2b963,#a86d22);
-      color: #140d05;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
       cursor: pointer;
     }
 
-    .small {
-      margin-top: 15px;
-      color: #7f7463;
-      font-size: 12px;
-      line-height: 1.4;
+    #installBtn {
+      display: none;
+      border: 1px solid #e4be72;
+      background: linear-gradient(#e5bc67, #a96d22);
+      color: #140d05;
     }
 
-    .offline {
-      color: #e4aa95;
+    #openBtn {
+      border: 1px solid #76511f;
+      background: #17130e;
+      color: #d7b26f;
+    }
+
+    #installedMsg {
+      display: none;
+      margin: 15px 0 2px;
+      padding: 13px;
+      border: 1px solid #4d6845;
+      border-radius: 13px;
+      background: #132018;
+      color: #c9dcaa;
+      font-weight: 800;
+    }
+
+    #help {
+      margin-top: 16px;
+      color: #8f826f;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 7px 12px;
+      border: 1px solid #69491d;
+      border-radius: 999px;
+      color: #cda762;
+      background: #120e08;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
     }
   </style>
 </head>
@@ -137,60 +147,85 @@
 
     <div class="line"></div>
 
-    <div id="status" class="status">
-      Ouverture de l’administration…
-    </div>
+    <div class="badge">APPLICATION ANDROID</div>
 
-    <div id="loader" class="loader"></div>
+    <p class="intro">
+      Installe d'abord The Gentleman sur ton écran d'accueil.
+      Ensuite, ouvre ton administration depuis l'application.
+    </p>
 
-    <button id="openBtn" class="open" type="button">
-      OUVRIR L’ADMINISTRATION
+    <button id="installBtn" type="button">
+      📲 INSTALLER L'APPLICATION
     </button>
 
-    <div class="small">
-      Cette application ouvre directement ton administration sécurisée Google Apps Script.
+    <div id="installedMsg">
+      ✅ The Gentleman est déjà installé.
+    </div>
+
+    <button id="openBtn" type="button">
+      🎩 OUVRIR L'ADMINISTRATION
+    </button>
+
+    <div id="help">
+      Si le bouton « Installer » n'apparaît pas tout de suite,
+      recharge cette page une fois puis attends quelques secondes.
+      Chrome peut aussi proposer « Installer l'application » dans le menu ⋮.
     </div>
   </main>
 
   <script>
     const ADMIN_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin";
-    const statusEl = document.getElementById('status');
-    const loaderEl = document.getElementById('loader');
-    const openBtn = document.getElementById('openBtn');
+    const installBtn = document.getElementById('installBtn');
+    const installedMsg = document.getElementById('installedMsg');
+    let deferredPrompt = null;
 
-    function openAdmin() {
-      if (!navigator.onLine) {
-        statusEl.textContent = "Connexion Internet requise.";
-        statusEl.classList.add("offline");
-        loaderEl.style.display = "none";
-        return;
-      }
-
-      statusEl.textContent = "Ouverture de l’administration…";
-      statusEl.classList.remove("offline");
-      loaderEl.style.display = "block";
-
-      // IMPORTANT : aucune iframe.
-      // Navigation directe vers Google Apps Script.
-      window.location.href = ADMIN_URL;
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.navigator.standalone === true;
     }
 
-    openBtn.addEventListener('click', openAdmin);
+    if (isStandalone()) {
+      installedMsg.style.display = 'block';
+    }
 
-    // Lance automatiquement l'admin quand l'app est ouverte.
-    window.addEventListener('load', () => {
-      setTimeout(openAdmin, 650);
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.style.display = 'block';
     });
 
-    window.addEventListener('offline', () => {
-      statusEl.textContent = "Connexion Internet requise.";
-      statusEl.classList.add("offline");
-      loaderEl.style.display = "none";
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+
+      if (choice.outcome === 'accepted') {
+        installBtn.style.display = 'none';
+      }
+
+      deferredPrompt = null;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+      installedMsg.style.display = 'block';
+    });
+
+    document.getElementById('openBtn').addEventListener('click', () => {
+      // Navigation volontaire uniquement : aucune redirection automatique.
+      window.location.href = ADMIN_URL;
     });
 
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+          await navigator.serviceWorker.ready;
+          console.log('PWA prête', registration.scope);
+        } catch (err) {
+          console.error('Service Worker:', err);
+        }
       });
     }
   </script>

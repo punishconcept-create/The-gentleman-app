@@ -1,33 +1,37 @@
-THE GENTLEMAN PWA - VERSION 2
+THE GENTLEMAN PWA - VERSION 3
 
-CORRECTION PRINCIPALE
-Cette version N'UTILISE PLUS D'IFRAME.
-Elle ouvre directement Google Apps Script pour éviter l'erreur Google 401.
+OBJECTIF
+Cette version est conçue pour être INSTALLABLE sur Android.
+Elle ne redirige plus automatiquement vers Google Apps Script.
 
-URL ADMIN UTILISEE
+FONCTIONNEMENT
+1. Ouvre la page GitHub Pages.
+2. Un bouton "INSTALLER L'APPLICATION" apparaît si Chrome autorise l'installation.
+3. Installe l'application.
+4. Depuis l'application The Gentleman, utilise "OUVRIR L'ADMINISTRATION".
+
+URL ADMIN
 https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin
 
-FICHIERS
+REMPLACEMENT SUR GITHUB
+Remplace ces fichiers à la racine du dépôt :
 - index.html
 - manifest.webmanifest
 - sw.js
 - icon-192.png
 - icon-512.png
 
-MISE A JOUR SUR GITHUB PAGES
-1. Ouvre ton dépôt GitHub : The-gentleman-app
-2. Remplace index.html, manifest.webmanifest, sw.js, icon-192.png et icon-512.png
-3. Commit changes
-4. Attends 1 à 3 minutes
-5. Ouvre :
+Puis Commit changes.
+
+IMPORTANT - CACHE
+Si une ancienne version a déjà été installée :
+1. Désinstalle The Gentleman de l'écran d'accueil.
+2. Dans Chrome Android, ouvre :
    https://punishconcept-create.github.io/The-gentleman-app/
+3. Recharge la page.
+4. Attends quelques secondes.
+5. Appuie sur "INSTALLER L'APPLICATION".
 
-SI TU AS DEJA INSTALLE L'ANCIENNE PWA
-- Désinstalle l'ancien raccourci/application The Gentleman.
-- Dans Chrome, recharge la page GitHub Pages.
-- Réinstalle l'application.
-Cela évite que l'ancien service worker/ancien index reste en cache.
-
-IMPORTANT
-Une PWA GitHub Pages ne peut pas conserver Google Apps Script à l'intérieur de son propre domaine
-sans iframe/proxy. Cette version privilégie donc la compatibilité : elle lance l'Admin directement.
+Si le bouton n'apparaît pas :
+- Chrome > menu ⋮ > Installer l'application
+- ou recharge la page après quelques secondes.
