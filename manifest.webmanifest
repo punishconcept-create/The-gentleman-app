@@ -2,12 +2,11 @@
   "id": "/The-gentleman-app/",
   "name": "The Gentleman",
   "short_name": "Gentleman",
-  "description": "Application d'administration The Gentleman Card",
   "start_url": "/The-gentleman-app/",
   "scope": "/The-gentleman-app/",
   "display": "standalone",
-  "background_color": "#0b0906",
-  "theme_color": "#0b0906",
+  "background_color": "#080603",
+  "theme_color": "#080603",
   "orientation": "portrait-primary",
   "icons": [
     {

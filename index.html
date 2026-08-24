@@ -1,233 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0906">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="The Gentleman">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="apple-touch-icon" href="./icon-192.png">
-  <title>The Gentleman</title>
-
-  <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      width: 100%;
-      min-height: 100%;
-      background: #0b0906;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #f2e9d9;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding: 20px;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at 85% 5%, rgba(194,136,50,.18), transparent 32%),
-        radial-gradient(circle at 8% 92%, rgba(141,88,22,.13), transparent 30%),
-        linear-gradient(145deg, #020202, #0b0906 65%, #171006);
-    }
-
-    .panel {
-      width: min(92vw, 540px);
-      padding: 36px 24px 28px;
-      border: 2px solid #a87329;
-      border-radius: 26px;
-      text-align: center;
-      background: linear-gradient(155deg,#070707,#120e08 70%,#0a0704);
-      box-shadow: 0 20px 60px rgba(0,0,0,.55);
-    }
-
-    .hat { font-size: 56px; line-height: 1; margin-bottom: 8px; }
-    .the {
-      color: #d1a85e;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 14px;
-      letter-spacing: 8px;
-    }
-    .brand {
-      margin-top: 3px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(38px, 11vw, 56px);
-      font-weight: 500;
-      color: #d7aa5b;
-      line-height: .96;
-    }
-    .tagline {
-      margin-top: 10px;
-      color: #c89b54;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 18px;
-      font-style: italic;
-    }
-    .line {
-      width: 68%;
-      height: 1px;
-      margin: 25px auto;
-      background: linear-gradient(90deg, transparent, #9d6c28, transparent);
-    }
-
-    .intro {
-      margin: 0 auto 18px;
-      max-width: 390px;
-      color: #c4b59f;
-      font-size: 15px;
-      line-height: 1.55;
-    }
-
-    button {
-      width: 100%;
-      min-height: 62px;
-      margin-top: 12px;
-      border-radius: 15px;
-      font-size: 17px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    #installBtn {
-      display: none;
-      border: 1px solid #e4be72;
-      background: linear-gradient(#e5bc67, #a96d22);
-      color: #140d05;
-    }
-
-    #openBtn {
-      border: 1px solid #76511f;
-      background: #17130e;
-      color: #d7b26f;
-    }
-
-    #installedMsg {
-      display: none;
-      margin: 15px 0 2px;
-      padding: 13px;
-      border: 1px solid #4d6845;
-      border-radius: 13px;
-      background: #132018;
-      color: #c9dcaa;
-      font-weight: 800;
-    }
-
-    #help {
-      margin-top: 16px;
-      color: #8f826f;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .badge {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 7px 12px;
-      border: 1px solid #69491d;
-      border-radius: 999px;
-      color: #cda762;
-      background: #120e08;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .5px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080603">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>The Gentleman</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh;min-height:100dvh;padding:22px 18px;display:grid;place-items:center;
+background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+linear-gradient(150deg,#020202,#090704 70%,#171006)}
+.app{width:min(94vw,560px);border:2px solid #9b6728;border-radius:28px;padding:30px 22px 25px;
+background:linear-gradient(155deg,#070707,#100c07 72%,#090603);box-shadow:0 20px 60px #0009}
+.logo{text-align:center} .hat{font-size:50px} .the{font:13px Georgia,serif;letter-spacing:8px;color:#cda45e}
+h1{font:500 clamp(37px,11vw,56px) Georgia,serif;color:#d3a554;margin:3px 0 5px;line-height:1}
+.tag{font:italic 18px Georgia,serif;color:#bd914d}
+.rule{height:1px;margin:23px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
+.welcome{text-align:center;color:#a99a84;font-size:14px;margin:0 0 20px}
+.grid{display:grid;gap:13px}
+.btn{display:flex;align-items:center;gap:15px;width:100%;min-height:78px;padding:14px 18px;border-radius:17px;
+text-decoration:none;border:1px solid #68461d;background:#15110c;color:#e1bf82;box-shadow:inset 0 0 0 1px #000}
+.btn.primary{background:linear-gradient(#dfb35d,#a76b20);color:#160e05;border-color:#dfb35d}
+.ico{font-size:29px;width:38px;text-align:center} .txt{text-align:left} .ttl{font-weight:900;font-size:17px}
+.sub{font-size:12px;margin-top:4px;opacity:.7;font-weight:500}
+.foot{text-align:center;color:#695f51;font-size:11px;margin-top:22px}
+</style>
 </head>
-
 <body>
-  <main class="panel">
-    <div class="hat">🎩</div>
-    <div class="the">THE</div>
-    <div class="brand">GENTLEMAN</div>
-    <div class="tagline">L'élégance à la caribéenne.</div>
-
-    <div class="line"></div>
-
-    <div class="badge">APPLICATION ANDROID</div>
-
-    <p class="intro">
-      Installe d'abord The Gentleman sur ton écran d'accueil.
-      Ensuite, ouvre ton administration depuis l'application.
-    </p>
-
-    <button id="installBtn" type="button">
-      📲 INSTALLER L'APPLICATION
-    </button>
-
-    <div id="installedMsg">
-      ✅ The Gentleman est déjà installé.
-    </div>
-
-    <button id="openBtn" type="button">
-      🎩 OUVRIR L'ADMINISTRATION
-    </button>
-
-    <div id="help">
-      Si le bouton « Installer » n'apparaît pas tout de suite,
-      recharge cette page une fois puis attends quelques secondes.
-      Chrome peut aussi proposer « Installer l'application » dans le menu ⋮.
-    </div>
-  </main>
-
-  <script>
-    const ADMIN_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin";
-    const installBtn = document.getElementById('installBtn');
-    const installedMsg = document.getElementById('installedMsg');
-    let deferredPrompt = null;
-
-    function isStandalone() {
-      return window.matchMedia('(display-mode: standalone)').matches ||
-             window.navigator.standalone === true;
-    }
-
-    if (isStandalone()) {
-      installedMsg.style.display = 'block';
-    }
-
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      installBtn.style.display = 'block';
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-
-      if (choice.outcome === 'accepted') {
-        installBtn.style.display = 'none';
-      }
-
-      deferredPrompt = null;
-    });
-
-    window.addEventListener('appinstalled', () => {
-      installBtn.style.display = 'none';
-      installedMsg.style.display = 'block';
-    });
-
-    document.getElementById('openBtn').addEventListener('click', () => {
-      // Navigation volontaire uniquement : aucune redirection automatique.
-      window.location.href = ADMIN_URL;
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
-          await navigator.serviceWorker.ready;
-          console.log('PWA prête', registration.scope);
-        } catch (err) {
-          console.error('Service Worker:', err);
-        }
-      });
-    }
-  </script>
-</body>
-</html>
+<main class="app">
+  <header class="logo">
+    <div class="hat">🎩</div><div class="the">THE</div><h1>GENTLEMAN</h1>
+    <div class="tag">L'élégance à la caribéenne.</div>
+  </header>
+  <div class="rule"></div>
+  <p class="welcome">TABLEAU DE BORD</p>
+  <section class="grid">
+    <a class="btn primary" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin">
+      <span class="ico">🎩</span><span class="txt"><div class="ttl">CRÉER UNE CARTE</div><div class="sub">Nouvelle Gentleman Card</div></span>
+    </a>
+    <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/manage">
+      <span class="ico">👥</span><span class="txt"><div class="ttl">GÉRER LES CARTES</div><div class="sub">Activation, événement et réactivation</div></span>
+    </a>
+    <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/scanner">
+      <span class="ico">📷</span><span class="txt"><div class="ttl">SCANNER UNE CARTE</div><div class="sub">Contrôle du QR Code au bar</div></span>
+    </a>
+    <a class="btn" href="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin">
+      <span class="ico">⚙️</span><span class="txt"><div class="ttl">ADMINISTRATION</div><div class="sub">Accès complet</div></span>
+    </a>
+  </section>
+  <div class="foot">THE GENTLEMAN • PUNISH CONCEPT</div>
+</main>
+<script>
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+</script>
+</body></html>
