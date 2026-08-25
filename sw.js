@@ -1,4 +1,4 @@
-const CACHE_NAME='gentleman-pwa-v5-20260824';
+const CACHE_NAME='gentleman-v6-separation';
 const SHELL=['./','./index.html','./scanner.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',event=>{
