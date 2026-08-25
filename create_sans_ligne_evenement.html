@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080603">
+  <title>The Gentleman — Créer une carte</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
+body{
+  min-height:100vh;min-height:100dvh;padding:14px;
+  background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+             linear-gradient(150deg,#020202,#090704 70%,#171006)
+}
+.wrap{
+  width:100%;max-width:620px;margin:auto;padding:22px 16px 28px;border:2px solid #9b6728;border-radius:24px;
+  background:linear-gradient(155deg,#070707,#100c07 72%,#090603)
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{
+  width:48px;height:48px;border-radius:14px;border:1px solid #68461d;background:#15110c;color:#e1bf82;
+  font-size:22px;font-weight:900
+}
+.brand{flex:1;text-align:center}
+.the{font:12px Georgia,serif;letter-spacing:7px;color:#cda45e}
+h1{font:500 clamp(31px,9vw,44px) Georgia,serif;color:#d3a554;margin:0}
+.tag{font:italic 15px Georgia,serif;color:#bd914d}
+.spacer{width:48px}
+.rule{height:1px;margin:18px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
+.sectionTitle{text-align:center;color:#ddb76d;font-size:22px;font-weight:900;margin:0 0 8px}
+.sectionDesc{text-align:center;color:#9f927f;font-size:14px;line-height:1.5;margin:0 0 20px}
+label{display:block;margin:17px 0 7px;font-weight:900;font-size:15px}
+input{
+  width:100%;min-height:58px;padding:12px 14px;border:2px solid #986523;border-radius:13px;
+  background:#f2eee7;color:#111;font-size:17px
+}
+button{font-family:inherit;cursor:pointer}
+.gold{background:linear-gradient(#dfb35e,#a86e23);color:#160e05;border:0}
+.dark{background:#17130d;color:#d6ad65;border:1px solid #74501f}
+.danger{background:#351111;color:#efb9a4;border:1px solid #784137}
+.action{
+  width:100%;min-height:60px;margin-top:10px;border-radius:13px;font-size:16px;font-weight:900
+}
+.status{
+  margin-top:13px;padding:13px;border:1px solid #68461d;border-radius:13px;background:#15110c;
+  text-align:center;line-height:1.45;color:#cbbda5
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cardItem{
+  padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c
+}
+@media(max-width:699px){
+  body{padding:14px}
+  .wrap{width:100%;max-width:620px;margin:auto;padding:22px 16px 28px}
+  label{font-size:16px}
+  input{min-height:60px;font-size:18px}
+  .action{min-height:62px;font-size:17px}
+}
+</style>
+</head>
+<body>
+<iframe name="gentlemanBridge" style="display:none;width:0;height:0;border:0"></iframe>
+<div class="wrap">
+  <div class="top">
+    <button class="back" type="button" onclick="location.href='./'">←</button>
+    <div class="brand">
+      <div class="the">THE</div>
+      <h1>GENTLEMAN</h1>
+      <div class="tag">Créer une carte</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="sectionTitle">CRÉER UNE CARTE</div>
+  <div class="sectionDesc">
+    Crée la Gentleman Card du client et active-la pour la date sélectionnée.
+  </div>
+
+  <label for="pseudo">PSEUDO DU CLIENT</label>
+  <input id="pseudo" type="text" placeholder="Ex : King D">
+<label for="dateEvenement">DATE DE L’ÉVÉNEMENT</label>
+  <input id="dateEvenement" type="date">
+
+  <label>📸 PHOTO DU CLIENT</label>
+  <div style="width:100%;min-height:300px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+              background:#000;border:2px solid #8b5c22;border-radius:18px">
+    <div id="placeholder" style="text-align:center;font-weight:900;color:#cbbda5">
+      <div style="font-size:72px">🎩</div>
+      PHOTO DU CLIENT
+    </div>
+    <img id="preview" alt="Photo du client" style="display:none;width:100%;max-height:520px;object-fit:contain">
+  </div>
+
+  <div class="grid2" style="margin-top:10px">
+    <button class="action gold" type="button" onclick="ouvrirCamera()">📸 PRENDRE LA PHOTO</button>
+    <button class="action dark" type="button" onclick="ouvrirGalerie()">🖼️ IMPORTER UNE PHOTO</button>
+  </div>
+
+  <input id="cameraInput" type="file" accept="image/*" capture="user" hidden onchange="traiterPhoto(event)">
+  <input id="galleryInput" type="file" accept="image/*" hidden onchange="traiterPhoto(event)">
+  <canvas id="canvas" hidden></canvas>
+
+  <button id="changeBtn" class="action dark" style="display:none" type="button" onclick="changerPhoto()">
+    🔄 CHANGER LA PHOTO
+  </button>
+
+  <label for="telephone">📲 WHATSAPP DU CLIENT</label>
+  <input id="telephone" type="tel" placeholder="Ex : 06 12 34 56 78">
+
+  <label for="email">✉️ E-MAIL DU CLIENT</label>
+  <input id="email" type="email" placeholder="Ex : client@gmail.com">
+
+  <label for="pin">🔐 PIN ADMINISTRATEUR</label>
+  <input id="pin" type="password" inputmode="numeric" placeholder="PIN ADMINISTRATEUR">
+
+  <button id="createBtn" class="action gold" type="button" onclick="creerCarte()">
+    CRÉER ET ACTIVER LA CARTE
+  </button>
+
+  <div id="message" class="status" style="display:none"></div>
+</div>
+
+<script>
+
+const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
+const BRIDGE_ORIGIN = "https://punishconcept-create.github.io";
+const bridgePending = new Map();
+
+window.addEventListener("message", function(event) {
+  if (event.origin !== "https://script.googleusercontent.com" &&
+      event.origin !== "https://script.google.com") {
+    return;
+  }
+
+  const payload = event.data || {};
+
+  if (payload.source !== "gentleman-pwa-bridge") return;
+
+  const cb = bridgePending.get(payload.requestId);
+  if (!cb) return;
+
+  bridgePending.delete(payload.requestId);
+  cb(payload.data || {ok:false,message:"Réponse vide"});
+});
+
+function bridgeCall(action, fields) {
+  return new Promise(function(resolve) {
+    const requestId =
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2);
+
+    bridgePending.set(requestId, resolve);
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = BRIDGE_URL;
+    form.target = "gentlemanBridge";
+    form.style.display = "none";
+
+    const values = Object.assign(
+      {},
+      fields || {},
+      {
+        bridgeAction: action,
+        requestId: requestId
+      }
+    );
+
+    Object.keys(values).forEach(function(key) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = values[key] == null ? "" : String(values[key]);
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function() { form.remove(); }, 1000);
+
+    setTimeout(function() {
+      if (bridgePending.has(requestId)) {
+        bridgePending.delete(requestId);
+        resolve({ok:false,message:"Le serveur ne répond pas. Réessaie."});
+      }
+    }, 30000);
+  });
+}
+
+let photoBase64 = "";
+let derniereCarte = null;
+
+function safe(v){
+  return String(v || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function showMessage(text){
+  const el=document.getElementById("message");
+  el.style.display="block";
+  el.textContent=text;
+}
+function ouvrirCamera(){
+  const el=document.getElementById("cameraInput");
+  el.value="";
+  el.click();
+}
+function ouvrirGalerie(){
+  const el=document.getElementById("galleryInput");
+  el.value="";
+  el.click();
+}
+function traiterPhoto(event){
+  const file=event.target.files && event.target.files[0];
+  if(!file) return;
+
+  const reader=new FileReader();
+  reader.onload=function(evt){
+    const image=new Image();
+    image.onload=function(){
+      const canvas=document.getElementById("canvas");
+      const max=900;
+      let w=image.width,h=image.height;
+
+      if(w>h && w>max){h=h*max/w;w=max;}
+      else if(h>=w && h>max){w=w*max/h;h=max;}
+
+      canvas.width=Math.round(w);
+      canvas.height=Math.round(h);
+      canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);
+
+      photoBase64=canvas.toDataURL("image/jpeg",0.80);
+
+      const preview=document.getElementById("preview");
+      preview.src=photoBase64;
+      preview.style.display="block";
+      document.getElementById("placeholder").style.display="none";
+      document.getElementById("changeBtn").style.display="block";
+    };
+    image.src=evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function changerPhoto(){
+  photoBase64="";
+  const preview=document.getElementById("preview");
+  preview.src="";
+  preview.style.display="none";
+  document.getElementById("placeholder").style.display="block";
+  document.getElementById("changeBtn").style.display="none";
+}
+async function creerCarte(){
+  const pseudo=document.getElementById("pseudo").value.trim();
+  const evenement="The Gentleman";
+  const dateEvenement=document.getElementById("dateEvenement").value;
+  const telephone=document.getElementById("telephone").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const pinAdmin=document.getElementById("pin").value.trim();
+  const btn=document.getElementById("createBtn");
+
+  if(!pseudo) return showMessage("❌ Saisis le pseudo.");
+  if(!dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
+  if(!photoBase64) return showMessage("❌ Prends ou importe une photo.");
+  if(!pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
+
+  btn.disabled=true;
+  btn.textContent="CRÉATION EN COURS…";
+  showMessage("⏳ Création en cours…");
+
+  const data=await bridgeCall("create",{
+    pseudo,photoBase64,evenement,dateEvenement,pinAdmin
+  });
+
+  btn.disabled=false;
+  btn.textContent="CRÉER ET ACTIVER LA CARTE";
+
+  if(!data || !data.ok){
+    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  derniereCarte={
+    id:data.id,
+    pseudo:data.pseudo,
+    photo:data.photo,
+    cardUrl:data.cardUrl,
+    telephone,
+    email
+  };
+
+  const el=document.getElementById("message");
+  el.style.display="block";
+  el.innerHTML=`
+    <div style="font-size:20px;font-weight:900;color:#ddb76d">✅ CARTE CRÉÉE ET ACTIVÉE</div>
+    <img src="${safe(data.photo)}" alt="Photo du client"
+         style="display:block;width:min(72vw,300px);aspect-ratio:1;object-fit:cover;margin:15px auto;
+                border:3px solid #a4742c;border-radius:18px">
+    <div style="font-size:28px;font-weight:900">${safe(data.pseudo)}</div>
+    <div style="font-size:22px;font-weight:900;color:#d1a259">${safe(data.id)}</div>
+    <div style="margin-top:12px;line-height:1.5">
+      <strong>${safe(data.evenement)}</strong><br>
+      📅 ${safe(data.dateEvenementFR)}
+    </div>
+    <button class="action gold" type="button" onclick="ouvrirCarte()">🎩 VOIR LA CARTE</button>
+    <button class="action dark" type="button" onclick="envoyerWhatsApp()">📲 ENVOYER PAR WHATSAPP</button>
+    <button class="action dark" type="button" onclick="envoyerEmail()">✉️ ENVOYER PAR E-MAIL</button>
+    <button class="action dark" type="button" onclick="partager()">📤 PARTAGER</button>
+    <button class="action dark" type="button" onclick="copierLien()">🔗 COPIER LE LIEN</button>
+  `;
+}
+function ouvrirCarte(){
+  if(derniereCarte && derniereCarte.cardUrl) window.open(derniereCarte.cardUrl,"_blank");
+}
+function normaliserTelephone(numero){
+  let tel=String(numero||"").replace(/\D/g,"");
+  if(tel.startsWith("0033")) tel=tel.substring(2);
+  if(tel.startsWith("0")) tel="33"+tel.substring(1);
+  return tel;
+}
+function envoyerWhatsApp(){
+  if(!derniereCarte) return;
+  const tel=normaliserTelephone(derniereCarte.telephone);
+  if(!tel) return alert("Aucun numéro WhatsApp renseigné.");
+
+  const texte=
+    "🎩 *THE GENTLEMAN*\n\n"+
+    "Voici ta Gentleman Card personnelle.\n\n"+
+    "Cette carte reste la tienne pour les prochains événements.\n"+
+    "Elle sera réactivée pour chaque événement réglé.\n\n"+
+    "👉 "+derniereCarte.cardUrl;
+
+  window.open("https://wa.me/"+tel+"?text="+encodeURIComponent(texte),"_blank");
+}
+async function envoyerEmail(){
+  if(!derniereCarte || !derniereCarte.email) return alert("Aucune adresse e-mail renseignée.");
+
+  const data=await bridgeCall("email",{
+    email:derniereCarte.email,
+    pseudo:derniereCarte.pseudo,
+    cardUrl:derniereCarte.cardUrl,
+    cardId:derniereCarte.id
+  });
+
+  alert(data && data.message ? data.message : (data && data.ok ? "E-mail envoyé." : "Erreur lors de l’envoi."));
+}
+async function partager(){
+  if(!derniereCarte) return;
+
+  if(navigator.share){
+    try{
+      await navigator.share({
+        title:"The Gentleman Card",
+        text:"Voici ta Gentleman Card personnelle.",
+        url:derniereCarte.cardUrl
+      });
+      return;
+    }catch(e){}
+  }
+
+  copierLien();
+}
+async function copierLien(){
+  if(!derniereCarte || !derniereCarte.cardUrl) return;
+
+  try{
+    await navigator.clipboard.writeText(derniereCarte.cardUrl);
+    alert("Lien copié.");
+  }catch(e){
+    prompt("Copie ce lien :",derniereCarte.cardUrl);
+  }
+}
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
+</body>
+</html>
