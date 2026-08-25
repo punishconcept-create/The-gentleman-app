@@ -107,71 +107,201 @@ button{font-family:inherit;cursor:pointer}
 <script>
 
 
+
 const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
-const bridgeFrame = document.getElementById("gentlemanBridge");
-const bridgePending = new Map();
-
-window.addEventListener("message", function(event) {
-  // Sécurité : accepter uniquement la réponse provenant de NOTRE iframe.
-  if (!bridgeFrame || event.source !== bridgeFrame.contentWindow) return;
-
-  const payload = event.data || {};
-  if (payload.source !== "gentleman-pwa-bridge") return;
-
-  const callback = bridgePending.get(payload.requestId);
-  if (!callback) return;
-
-  bridgePending.delete(payload.requestId);
-  callback(payload.data || {ok:false,message:"Réponse vide"});
-});
+const BRIDGE_TIMEOUT = 45000;
 
 function bridgeCall(action, fields) {
   return new Promise(function(resolve) {
+
     const requestId =
       Date.now().toString(36) +
       Math.random().toString(36).slice(2);
 
-    bridgePending.set(requestId, resolve);
+    let finished = false;
+    let currentScript = null;
 
-    const form = document.createElement("form");
+    function finish(data) {
+      if (finished) return;
+      finished = true;
+
+      if (
+        currentScript &&
+        currentScript.parentNode
+      ) {
+        currentScript.parentNode.removeChild(
+          currentScript
+        );
+      }
+
+      resolve(
+        data || {
+          ok: false,
+          message: "Réponse serveur vide."
+        }
+      );
+    }
+
+    function poll() {
+      if (finished) return;
+
+      const callbackName =
+        "__gentlemanPoll_" +
+        requestId.replace(
+          /[^A-Za-z0-9_$]/g,
+          ""
+        );
+
+      window[callbackName] =
+        function(payload) {
+
+          try {
+            delete window[callbackName];
+          } catch (e) {
+            window[callbackName] = undefined;
+          }
+
+          if (
+            currentScript &&
+            currentScript.parentNode
+          ) {
+            currentScript.parentNode
+              .removeChild(currentScript);
+          }
+
+          currentScript = null;
+
+          if (
+            payload &&
+            payload.ready
+          ) {
+            finish(payload.data);
+            return;
+          }
+
+          if (!finished) {
+            setTimeout(
+              poll,
+              650
+            );
+          }
+        };
+
+      currentScript =
+        document.createElement("script");
+
+      currentScript.src =
+        BRIDGE_URL +
+        "?bridgePoll=" +
+        encodeURIComponent(requestId) +
+        "&callback=" +
+        encodeURIComponent(callbackName) +
+        "&_=" +
+        Date.now();
+
+      currentScript.onerror =
+        function() {
+
+          try {
+            delete window[callbackName];
+          } catch (e) {}
+
+          if (
+            currentScript &&
+            currentScript.parentNode
+          ) {
+            currentScript.parentNode
+              .removeChild(currentScript);
+          }
+
+          currentScript = null;
+
+          if (!finished) {
+            setTimeout(
+              poll,
+              1000
+            );
+          }
+        };
+
+      document.head.appendChild(
+        currentScript
+      );
+    }
+
+
+    const form =
+      document.createElement("form");
+
     form.method = "POST";
     form.action = BRIDGE_URL;
     form.target = "gentlemanBridge";
     form.style.display = "none";
 
-    const values = Object.assign(
-      {},
-      fields || {},
-      {
-        bridgeAction: action,
-        requestId: requestId
-      }
-    );
 
-    Object.keys(values).forEach(function(key) {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = key;
-      input.value = values[key] == null ? "" : String(values[key]);
-      form.appendChild(input);
-    });
+    const values =
+      Object.assign(
+        {},
+        fields || {},
+        {
+          bridgeAction: action,
+          requestId: requestId
+        }
+      );
+
+
+    Object.keys(values)
+      .forEach(function(key) {
+
+        const input =
+          document.createElement("input");
+
+        input.type = "hidden";
+        input.name = key;
+
+        input.value =
+          values[key] == null
+            ? ""
+            : String(values[key]);
+
+        form.appendChild(input);
+      });
+
 
     document.body.appendChild(form);
+
     form.submit();
 
-    setTimeout(function() {
-      form.remove();
-    }, 1500);
 
-    setTimeout(function() {
-      if (bridgePending.has(requestId)) {
-        bridgePending.delete(requestId);
-        resolve({
-          ok:false,
-          message:"Connexion au serveur impossible."
-        });
-      }
-    }, 30000);
+    setTimeout(
+      function() {
+        form.remove();
+      },
+      1200
+    );
+
+
+    setTimeout(
+      poll,
+      700
+    );
+
+
+    setTimeout(
+      function() {
+
+        if (!finished) {
+          finish({
+            ok: false,
+            message:
+              "Le serveur n’a pas confirmé l’opération."
+          });
+        }
+
+      },
+      BRIDGE_TIMEOUT
+    );
+
   });
 }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-bridge-v10";
+const CACHE_NAME="gentleman-pwa-v11-jsonp";
 const SHELL=[
   "./",
   "./index.html",
