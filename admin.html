@@ -105,10 +105,18 @@ const BRIDGE_ORIGIN = "https://punishconcept-create.github.io";
 const bridgePending = new Map();
 
 window.addEventListener("message", function(event) {
-  if (event.origin !== "https://script.googleusercontent.com" &&
-      event.origin !== "https://script.google.com") {
-    return;
-  }
+  let allowed = false;
+
+  try {
+    const host = new URL(event.origin).hostname;
+    allowed =
+      host === "script.google.com" ||
+      host === "script.googleusercontent.com" ||
+      host.endsWith(".googleusercontent.com") ||
+      host.endsWith("-script.googleusercontent.com");
+  } catch (e) {}
+
+  if (!allowed) return;
 
   const payload = event.data || {};
 
@@ -159,7 +167,7 @@ function bridgeCall(action, fields) {
     setTimeout(function() {
       if (bridgePending.has(requestId)) {
         bridgePending.delete(requestId);
-        resolve({ok:false,message:"Le serveur ne répond pas. Réessaie."});
+        resolve({ok:false,message:"Connexion Apps Script impossible. Vérifie le déploiement puis réessaie."});
       }
     }, 30000);
   });

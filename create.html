@@ -76,12 +76,16 @@ button{font-family:inherit;cursor:pointer}
 
   <div class="sectionTitle">CRÉER UNE CARTE</div>
   <div class="sectionDesc">
-    Crée la Gentleman Card du client et active-la pour la date sélectionnée.
+    Crée la Gentleman Card du client et active-la pour l’événement sélectionné.
   </div>
 
   <label for="pseudo">PSEUDO DU CLIENT</label>
   <input id="pseudo" type="text" placeholder="Ex : King D">
-<label for="dateEvenement">DATE DE L’ÉVÉNEMENT</label>
+
+  <label for="evenement">ÉVÉNEMENT</label>
+  <input id="evenement" type="text" placeholder="Ex : The Gentleman — Septembre">
+
+  <label for="dateEvenement">DATE DE L’ÉVÉNEMENT</label>
   <input id="dateEvenement" type="date">
 
   <label>📸 PHOTO DU CLIENT</label>
@@ -130,10 +134,18 @@ const BRIDGE_ORIGIN = "https://punishconcept-create.github.io";
 const bridgePending = new Map();
 
 window.addEventListener("message", function(event) {
-  if (event.origin !== "https://script.googleusercontent.com" &&
-      event.origin !== "https://script.google.com") {
-    return;
-  }
+  let allowed = false;
+
+  try {
+    const host = new URL(event.origin).hostname;
+    allowed =
+      host === "script.google.com" ||
+      host === "script.googleusercontent.com" ||
+      host.endsWith(".googleusercontent.com") ||
+      host.endsWith("-script.googleusercontent.com");
+  } catch (e) {}
+
+  if (!allowed) return;
 
   const payload = event.data || {};
 
@@ -184,7 +196,7 @@ function bridgeCall(action, fields) {
     setTimeout(function() {
       if (bridgePending.has(requestId)) {
         bridgePending.delete(requestId);
-        resolve({ok:false,message:"Le serveur ne répond pas. Réessaie."});
+        resolve({ok:false,message:"Connexion Apps Script impossible. Vérifie le déploiement puis réessaie."});
       }
     }, 30000);
   });
@@ -254,7 +266,7 @@ function changerPhoto(){
 }
 async function creerCarte(){
   const pseudo=document.getElementById("pseudo").value.trim();
-  const evenement="The Gentleman";
+  const evenement=document.getElementById("evenement").value.trim();
   const dateEvenement=document.getElementById("dateEvenement").value;
   const telephone=document.getElementById("telephone").value.trim();
   const email=document.getElementById("email").value.trim();
@@ -262,6 +274,7 @@ async function creerCarte(){
   const btn=document.getElementById("createBtn");
 
   if(!pseudo) return showMessage("❌ Saisis le pseudo.");
+  if(!evenement) return showMessage("❌ Saisis le nom de l’événement.");
   if(!dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
   if(!photoBase64) return showMessage("❌ Prends ou importe une photo.");
   if(!pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
