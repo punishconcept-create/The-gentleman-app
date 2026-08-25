@@ -167,6 +167,15 @@
       }
     }
 
+
+    /* VERSION CAMÉRA V3 */
+    #reader__dashboard,
+    #reader__dashboard_section,
+    #reader__dashboard_section_csr,
+    #reader__camera_selection,
+    #reader__dashboard_section_swaplink {
+      display:none !important;
+    }
 </style>
 </head>
 <body>
@@ -245,6 +254,7 @@ function onScanSuccess(decodedText) {
 function onScanFailure(_) {}
 
 
+
 window.addEventListener("load", async () => {
   const status = document.getElementById("status");
 
@@ -254,44 +264,17 @@ window.addEventListener("load", async () => {
     return;
   }
 
-  const qr =
-    new Html5Qrcode("reader");
+  const qr = new Html5Qrcode("reader");
 
-  try {
-
-    status.textContent =
-      "📷 Autorise la caméra. La caméra arrière sera utilisée automatiquement.";
-
-    // On demande directement la caméra arrière.
-    // C'est plus fiable sur iPhone que de choisir une caméra
-    // à partir d'une liste dont l'ordre peut varier.
-    await qr.start(
-      {
-        facingMode: {
-          ideal: "environment"
-        }
-      },
+  async function startWithCamera(config) {
+    return qr.start(
+      config,
       {
         fps: 12,
         qrbox: function(viewfinderWidth, viewfinderHeight) {
-          const minEdge =
-            Math.min(
-              viewfinderWidth,
-              viewfinderHeight
-            );
-
-          const size =
-            Math.max(
-              220,
-              Math.floor(
-                minEdge * 0.72
-              )
-            );
-
-          return {
-            width: size,
-            height: size
-          };
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const size = Math.max(220, Math.floor(minEdge * 0.72));
+          return { width: size, height: size };
         },
         aspectRatio: 1.0,
         disableFlip: false
@@ -300,23 +283,59 @@ window.addEventListener("load", async () => {
         traiter(decodedText);
       },
       function() {
-        // Les échecs intermédiaires de lecture sont normaux.
+        // Échec intermédiaire normal tant qu'aucun QR n'est détecté.
       }
     );
+  }
+
+  try {
+    status.textContent =
+      "📷 Autorise la caméra. La caméra arrière sera utilisée automatiquement.";
+
+    // Forme explicitement acceptée par html5-qrcode 2.3.8.
+    await startWithCamera({
+      facingMode: {
+        exact: "environment"
+      }
+    });
 
     status.textContent =
       "📷 Caméra arrière activée. Présente le QR Code Gentleman.";
 
-  } catch (e) {
+  } catch (firstError) {
 
-    status.textContent =
-      "❌ Impossible d'activer la caméra : " +
-      (
-        e && e.message
-          ? e.message
-          : e
-      );
+    try {
+      // Repli fiable iPhone / Android :
+      // on demande la liste réelle des caméras après permission.
+      const cameras = await Html5Qrcode.getCameras();
 
+      if (!cameras || !cameras.length) {
+        throw firstError;
+      }
+
+      let selected =
+        cameras.find(function(camera) {
+          return /back|rear|environment|arrière/i.test(camera.label || "");
+        });
+
+      if (!selected) {
+        selected = cameras[cameras.length - 1];
+      }
+
+      await startWithCamera(selected.id);
+
+      status.textContent =
+        "📷 Caméra arrière activée. Présente le QR Code Gentleman.";
+
+    } catch (fallbackError) {
+      status.textContent =
+        "❌ Impossible d'activer la caméra : " +
+        (
+          fallbackError && fallbackError.message
+            ? fallbackError.message
+            : fallbackError
+        );
+    }
   }
 });
 

@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v14-scanner-qr";
+const CACHE_NAME="gentleman-pwa-v15-camera";
 const SHELL=[
   "./",
   "./index.html",
