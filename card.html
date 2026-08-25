@@ -115,9 +115,10 @@ function renderCard(data) {
     return;
   }
 
-  const controlUrl =
-    APPS_SCRIPT_URL +
-    "/bar?id=" +
+  const cardPublicUrl =
+    location.origin +
+    location.pathname +
+    "?id=" +
     encodeURIComponent(CARD_ID) +
     "&token=" +
     encodeURIComponent(CARD_TOKEN);
@@ -125,7 +126,7 @@ function renderCard(data) {
   const qrUrl =
     "https://api.qrserver.com/v1/create-qr-code/" +
     "?size=700x700&margin=10&data=" +
-    encodeURIComponent(controlUrl);
+    encodeURIComponent(cardPublicUrl);
 
   let statusClass = "statusExpired";
   let statusText = data.messageEvenement || "Carte inactive";

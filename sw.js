@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v13-admin-fusion";
+const CACHE_NAME="gentleman-pwa-v14-scanner-qr";
 const SHELL=[
   "./",
   "./index.html",
