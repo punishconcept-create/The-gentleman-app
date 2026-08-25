@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-iframe-v9";
+const CACHE_NAME="gentleman-pwa-bridge-v10";
 const SHELL=[
   "./",
   "./index.html",
