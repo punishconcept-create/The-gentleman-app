@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-local-v7";
+const CACHE_NAME="gentleman-pwa-iframe-v9";
 const SHELL=[
   "./",
   "./index.html",
