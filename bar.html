@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080603">
+<title>The Gentleman — Contrôle Bar</title>
+<link rel="manifest" href="./manifest.webmanifest">
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:#080603;
+  color:#ead8b4;
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  min-height:100vh;
+  min-height:100dvh;
+  padding:14px;
+  background:
+    radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+    linear-gradient(150deg,#020202,#090704 70%,#171006);
+}
+
+.wrap{
+  width:100%;
+  max-width:620px;
+  margin:0 auto;
+  padding:22px 16px 28px;
+  border:2px solid #9b6728;
+  border-radius:24px;
+  background:
+    linear-gradient(155deg,#070707,#100c07 72%,#090603);
+}
+
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.back{
+  flex:0 0 48px;
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  border:1px solid #68461d;
+  background:#15110c;
+  color:#e1bf82;
+  font-size:22px;
+  font-weight:900;
+}
+
+.brand{
+  flex:1;
+  text-align:center;
+}
+
+.the{
+  font:12px Georgia,serif;
+  letter-spacing:7px;
+  color:#cda45e;
+}
+
+h1{
+  margin:0;
+  color:#d3a554;
+  font:500 clamp(31px,9vw,44px) Georgia,serif;
+}
+
+.tag{
+  color:#bd914d;
+  font:italic 16px Georgia,serif;
+}
+
+.spacer{
+  width:48px;
+  flex:0 0 48px;
+}
+
+.rule{
+  width:72%;
+  height:1px;
+  margin:18px auto;
+  background:
+    linear-gradient(90deg,transparent,#956126,transparent);
+}
+
+.status{
+  margin-top:8px;
+  padding:18px 14px;
+  border-radius:14px;
+  font-size:22px;
+  line-height:1.25;
+  font-weight:900;
+  text-align:center;
+}
+
+.valid{
+  background:#142018;
+  color:#d9c58d;
+  border:1px solid #55764a;
+}
+
+.invalid{
+  background:#351111;
+  color:#efb9a4;
+  border:1px solid #784137;
+}
+
+.upcoming{
+  background:#27200e;
+  color:#e0c070;
+  border:1px solid #806621;
+}
+
+.photo{
+  display:block;
+  width:min(78vw,390px);
+  aspect-ratio:1;
+  object-fit:cover;
+  margin:20px auto 0;
+  border:3px solid #a5742b;
+  border-radius:22px;
+  background:#050403;
+}
+
+.name{
+  margin-top:17px;
+  font-size:36px;
+  line-height:1.1;
+  font-weight:900;
+  text-align:center;
+}
+
+.number{
+  margin-top:5px;
+  color:#d0a15a;
+  font-size:21px;
+  font-weight:900;
+  text-align:center;
+}
+
+.event{
+  margin-top:18px;
+  padding:17px 12px;
+  background:#161008;
+  border:1px solid #67471e;
+  border-radius:13px;
+  text-align:center;
+}
+
+.eventName{
+  color:#dec077;
+  font-size:21px;
+  font-weight:900;
+}
+
+.eventDate{
+  margin-top:5px;
+  color:#cbbda8;
+  font-size:18px;
+}
+
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:20px;
+}
+
+.box{
+  padding:18px 8px;
+  background:#15110b;
+  border:1px solid #6c4b20;
+  border-radius:13px;
+  text-align:center;
+  font-size:14px;
+}
+
+.value{
+  margin-top:6px;
+  font-size:31px;
+  font-weight:900;
+}
+
+.passages{
+  color:#d0a057;
+}
+
+.bar{
+  margin-top:22px;
+  padding-top:20px;
+  border-top:1px solid #57401d;
+}
+
+input{
+  width:100%;
+  min-height:66px;
+  padding:12px 14px;
+  border:2px solid #9b6925;
+  border-radius:13px;
+  background:#f4efe7;
+  color:#111;
+  font-size:22px;
+  text-align:center;
+}
+
+.action{
+  width:100%;
+  min-height:68px;
+  margin-top:12px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(#dcb15d,#a46b21);
+  color:#160e05;
+  font-size:19px;
+  font-weight:900;
+}
+
+#message{
+  margin-top:15px;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  font-size:18px;
+  font-weight:900;
+}
+
+.loading{
+  padding:70px 10px;
+  text-align:center;
+  color:#cbbda5;
+  font-size:18px;
+}
+
+@media(max-width:699px){
+  body{
+    padding:10px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:20px 14px 26px;
+  }
+
+  .status{
+    font-size:22px;
+  }
+
+  .photo{
+    width:min(82vw,390px);
+  }
+
+  .name{
+    font-size:36px;
+  }
+
+  .info{
+    gap:8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="top">
+    <button class="back" type="button" onclick="location.href='./scanner.html'">←</button>
+
+    <div class="brand">
+      <div class="the">THE</div>
+      <h1>GENTLEMAN</h1>
+      <div class="tag">Contrôle Bar</div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div id="content" class="loading">
+    Vérification de la carte…
+  </div>
+
+</div>
+
+<iframe
+  id="gentlemanBridge"
+  name="gentlemanBridge"
+  style="display:none;width:0;height:0;border:0"
+></iframe>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
+
+const params =
+  new URLSearchParams(
+    location.search
+  );
+
+const CARD_ID =
+  (params.get("id") || "").trim();
+
+const CARD_TOKEN =
+  (params.get("token") || "").trim();
+
+
+function safe(value){
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+
+function loadCard(){
+  if(!CARD_ID || !CARD_TOKEN){
+    renderError(
+      "❌ CARTE INCONNUE"
+    );
+    return;
+  }
+
+  const callbackName =
+    "__gentlemanBarCard_" +
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2);
+
+  window[callbackName] =
+    function(data){
+      try{
+        delete window[callbackName];
+      }catch(e){}
+
+      if(
+        script &&
+        script.parentNode
+      ){
+        script.parentNode.removeChild(
+          script
+        );
+      }
+
+      renderCard(data);
+    };
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+  script.src =
+    APPS_SCRIPT_URL +
+    "?pwaCardData=1" +
+    "&id=" +
+    encodeURIComponent(CARD_ID) +
+    "&token=" +
+    encodeURIComponent(CARD_TOKEN) +
+    "&callback=" +
+    encodeURIComponent(callbackName) +
+    "&_=" +
+    Date.now();
+
+  script.onerror =
+    function(){
+      renderError(
+        "❌ Impossible de vérifier la carte."
+      );
+    };
+
+  document.head.appendChild(
+    script
+  );
+}
+
+
+function renderError(message){
+  const content =
+    document.getElementById(
+      "content"
+    );
+
+  content.className =
+    "status invalid";
+
+  content.textContent =
+    message;
+}
+
+
+function renderCard(data){
+  const content =
+    document.getElementById(
+      "content"
+    );
+
+  if(
+    !data ||
+    !data.carteExiste
+  ){
+    renderError(
+      "❌ CARTE INCONNUE"
+    );
+    return;
+  }
+
+  if(data.blocageGeneral){
+    content.className = "";
+
+    content.innerHTML = `
+      <div class="status invalid">
+        ⛔ CARTE DÉSACTIVÉE
+      </div>
+
+      <img
+        src="${safe(data.photo)}"
+        class="photo"
+        alt="Photo du client"
+      >
+
+      <div class="name">
+        ${safe(data.pseudo)}
+      </div>
+
+      <div class="number">
+        ${safe(data.id)}
+      </div>
+    `;
+
+    return;
+  }
+
+  let statusHtml = "";
+
+  if(data.evenementActif){
+    statusHtml =
+      '<div class="status valid">✅ CARTE ACTIVE</div>';
+  }
+  else if(
+    data.etatEvenement ===
+    "A_VENIR"
+  ){
+    statusHtml =
+      '<div class="status upcoming">⏳ ACTIVATION À VENIR</div>';
+  }
+  else{
+    statusHtml =
+      '<div class="status invalid">❌ NON ACTIVÉE POUR CE SOIR</div>';
+  }
+
+  let validationHtml = "";
+
+  if(data.evenementActif){
+    validationHtml = `
+      <div class="bar">
+        <input
+          id="pinBar"
+          type="password"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="PIN BAR"
+        >
+
+        <button
+          class="action"
+          type="button"
+          onclick="validerPassageBar()"
+        >
+          ✓ VALIDER LE PASSAGE
+        </button>
+
+        <div id="message"></div>
+      </div>
+    `;
+  }
+  else{
+    validationHtml = `
+      <div class="bar">
+        <div id="message">
+          ${safe(
+            data.messageEvenement ||
+            "Carte non active"
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  content.className = "";
+
+  content.innerHTML = `
+    ${statusHtml}
+
+    <img
+      src="${safe(data.photo)}"
+      class="photo"
+      alt="Photo du client"
+    >
+
+    <div class="name">
+      ${safe(data.pseudo)}
+    </div>
+
+    <div class="number">
+      ${safe(data.id)}
+    </div>
+
+    <div class="event">
+      <div class="eventName">
+        ${safe(
+          data.evenement ||
+          "The Gentleman"
+        )}
+      </div>
+
+      <div class="eventDate">
+        ${data.dateEvenementFR
+          ? "📅 " +
+            safe(data.dateEvenementFR)
+          : ""
+        }
+      </div>
+    </div>
+
+    <div class="info">
+
+      <div class="box">
+        <div>
+          VALABLE JUSQU’À
+        </div>
+
+        <div class="value">
+          02H00
+        </div>
+      </div>
+
+      <div class="box">
+        <div>
+          PASSAGES CE SOIR
+        </div>
+
+        <div class="value passages">
+          ${Number(data.passages || 0)}
+        </div>
+      </div>
+
+    </div>
+
+    ${validationHtml}
+  `;
+}
+
+
+function bridgeCall(
+  action,
+  fields
+){
+  return new Promise(
+    function(resolve){
+      const requestId =
+        Date.now().toString(36) +
+        Math.random().toString(36).slice(2);
+
+      let finished = false;
+      let currentScript = null;
+
+      function finish(data){
+        if(finished) return;
+
+        finished = true;
+
+        if(
+          currentScript &&
+          currentScript.parentNode
+        ){
+          currentScript.parentNode.removeChild(
+            currentScript
+          );
+        }
+
+        resolve(
+          data || {
+            ok:false,
+            message:"Réponse serveur vide."
+          }
+        );
+      }
+
+      function poll(){
+        if(finished) return;
+
+        const callbackName =
+          "__gentlemanBarPoll_" +
+          requestId.replace(
+            /[^A-Za-z0-9_$]/g,
+            ""
+          );
+
+        window[callbackName] =
+          function(payload){
+            try{
+              delete window[callbackName];
+            }catch(e){}
+
+            if(
+              currentScript &&
+              currentScript.parentNode
+            ){
+              currentScript.parentNode.removeChild(
+                currentScript
+              );
+            }
+
+            currentScript = null;
+
+            if(
+              payload &&
+              payload.ready
+            ){
+              finish(
+                payload.data
+              );
+              return;
+            }
+
+            if(!finished){
+              setTimeout(
+                poll,
+                650
+              );
+            }
+          };
+
+        currentScript =
+          document.createElement(
+            "script"
+          );
+
+        currentScript.src =
+          APPS_SCRIPT_URL +
+          "?bridgePoll=" +
+          encodeURIComponent(requestId) +
+          "&callback=" +
+          encodeURIComponent(callbackName) +
+          "&_=" +
+          Date.now();
+
+        currentScript.onerror =
+          function(){
+            try{
+              delete window[callbackName];
+            }catch(e){}
+
+            if(
+              currentScript &&
+              currentScript.parentNode
+            ){
+              currentScript.parentNode.removeChild(
+                currentScript
+              );
+            }
+
+            currentScript = null;
+
+            if(!finished){
+              setTimeout(
+                poll,
+                1000
+              );
+            }
+          };
+
+        document.head.appendChild(
+          currentScript
+        );
+      }
+
+
+      const form =
+        document.createElement(
+          "form"
+        );
+
+      form.method = "POST";
+      form.action =
+        APPS_SCRIPT_URL;
+
+      form.target =
+        "gentlemanBridge";
+
+      form.style.display =
+        "none";
+
+
+      const values =
+        Object.assign(
+          {},
+          fields || {},
+          {
+            bridgeAction: action,
+            requestId: requestId
+          }
+        );
+
+
+      Object.keys(values)
+        .forEach(
+          function(key){
+            const input =
+              document.createElement(
+                "input"
+              );
+
+            input.type =
+              "hidden";
+
+            input.name =
+              key;
+
+            input.value =
+              values[key] == null
+                ? ""
+                : String(
+                    values[key]
+                  );
+
+            form.appendChild(
+              input
+            );
+          }
+        );
+
+
+      document.body.appendChild(
+        form
+      );
+
+      form.submit();
+
+
+      setTimeout(
+        function(){
+          form.remove();
+        },
+        1200
+      );
+
+
+      setTimeout(
+        poll,
+        700
+      );
+
+
+      setTimeout(
+        function(){
+          if(!finished){
+            finish({
+              ok:false,
+              message:
+                "Le serveur n’a pas confirmé l’opération."
+            });
+          }
+        },
+        45000
+      );
+    }
+  );
+}
+
+
+async function validerPassageBar(){
+  const pin =
+    (
+      document.getElementById(
+        "pinBar"
+      ) || {}
+    ).value || "";
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+  if(!pin.trim()){
+    message.textContent =
+      "❌ Entre le PIN BAR.";
+    return;
+  }
+
+  message.textContent =
+    "⏳ Validation en cours…";
+
+  const data =
+    await bridgeCall(
+      "validate",
+      {
+        cardId:
+          CARD_ID,
+
+        cardToken:
+          CARD_TOKEN,
+
+        pinBar:
+          pin.trim()
+      }
+    );
+
+  if(
+    !data ||
+    !data.ok
+  ){
+    message.textContent =
+      "❌ " +
+      (
+        data && data.message
+          ? data.message
+          : "Erreur inconnue"
+      );
+
+    return;
+  }
+
+  message.textContent =
+    "✅ PASSAGE VALIDÉ — N°" +
+    data.passages;
+
+  setTimeout(
+    loadCard,
+    700
+  );
+}
+
+
+loadCard();
+
+
+if(
+  "serviceWorker"
+  in navigator
+){
+  navigator.serviceWorker.register(
+    "./sw.js"
+  );
+}
+</script>
+
+</body>
+</html>

@@ -1,10 +1,11 @@
-const CACHE_NAME="gentleman-pwa-v15-camera";
+const CACHE_NAME="gentleman-pwa-v16-bar-pwa";
 const SHELL=[
   "./",
   "./index.html",
   "./create.html",
   "./manage.html",
   "./scanner.html",
+  "./bar.html",
   "./admin.html",
   "./card.html",
   "./manifest.webmanifest",
