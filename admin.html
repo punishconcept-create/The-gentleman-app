@@ -76,17 +76,13 @@ button{font-family:inherit;cursor:pointer}
 
   <div class="sectionTitle">RÉACTIVER UNE CARTE</div>
   <div class="sectionDesc">
-    Saisis le numéro de carte, le nouvel événement et sa date.<br>
+    Saisis le numéro de carte et la nouvelle date.<br>
     Le QR code et la Gentleman Card restent identiques.
   </div>
 
   <label for="cardId">NUMÉRO DE CARTE</label>
   <input id="cardId" type="text" placeholder="Ex : GC-005">
-
-  <label for="eventName">NOUVEL ÉVÉNEMENT</label>
-  <input id="eventName" type="text" placeholder="Ex : The Gentleman — Octobre">
-
-  <label for="eventDate">DATE DE L’ÉVÉNEMENT</label>
+<label for="eventDate">DATE DE L’ÉVÉNEMENT</label>
   <input id="eventDate" type="date">
 
   <label for="pin">🔐 PIN ADMINISTRATEUR</label>
@@ -307,7 +303,7 @@ function showMessage(text){
 function vals(){
   return {
     cardId:document.getElementById("cardId").value.trim().toUpperCase(),
-    evenement:document.getElementById("eventName").value.trim(),
+    evenement:"The Gentleman",
     dateEvenement:document.getElementById("eventDate").value,
     pinAdmin:document.getElementById("pin").value.trim()
   };
@@ -316,7 +312,6 @@ async function reactiver(){
   const v=vals();
 
   if(!v.cardId) return showMessage("❌ Saisis le numéro de carte.");
-  if(!v.evenement) return showMessage("❌ Saisis le nouvel événement.");
   if(!v.dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
   if(!v.pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
 

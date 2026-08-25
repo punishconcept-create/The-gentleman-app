@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080603">
+<title>The Gentleman Card</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#080603;color:#f5ead8;font-family:Arial,Helvetica,sans-serif}
+body{
+  min-height:100vh;min-height:100dvh;padding:14px;
+  background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+             linear-gradient(150deg,#020202,#090704 70%,#171006)
+}
+.card{
+  width:100%;max-width:620px;margin:auto;padding:22px 16px 28px;
+  text-align:center;border:2px solid #9b6728;border-radius:24px;
+  background:linear-gradient(155deg,#070707,#100c07 72%,#090603)
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{
+  width:48px;height:48px;border-radius:14px;border:1px solid #68461d;background:#15110c;
+  color:#e1bf82;font-size:22px;font-weight:900
+}
+.brand{flex:1;text-align:center}
+.brandThe{color:#d1a85e;font:12px Georgia,serif;letter-spacing:7px}
+.logo{margin:0;color:#d4a34d;font:500 clamp(31px,9vw,44px) Georgia,serif}
+.subtitle{color:#c89b54;font:italic 15px Georgia,serif}
+.spacer{width:48px}
+.separator{width:72%;height:1px;margin:18px auto;background:linear-gradient(90deg,transparent,#956126,transparent)}
+.hat{font-size:44px;margin-top:4px}
+.photoFrame{
+  width:min(78vw,390px);aspect-ratio:1;margin:12px auto 0;padding:5px;
+  background:linear-gradient(#e0b45f,#865116);border-radius:27px
+}
+.photo{width:100%;height:100%;object-fit:cover;border-radius:22px}
+.pseudo{margin-top:18px;font-size:36px;font-weight:900;text-transform:uppercase}
+.number{
+  display:inline-block;margin-top:8px;padding:8px 20px;border:1px solid #8f6224;
+  border-radius:30px;color:#d8ad62;font-size:18px;font-weight:900
+}
+.eventBox{margin-top:20px;padding:16px 12px;border:1px solid #75501f;border-radius:14px;background:#151008;line-height:1.55}
+.eventName{color:#e0bd76;font-size:21px;font-weight:900}
+.eventDate{margin-top:5px;color:#ddd0b9;font-size:18px}
+.eventStatus{margin-top:10px;padding:12px;border-radius:10px;font-weight:900;font-size:16px}
+.statusActive{background:#132218;color:#c8da9b;border:1px solid #4e713e}
+.statusUpcoming{background:#27200e;color:#e0c070;border:1px solid #806621}
+.statusExpired{background:#281311;color:#e5a38f;border:1px solid #753c31}
+.offer{margin-top:18px;padding:20px 13px;border:1px solid #704a1b;border-radius:14px;background:#171008;font-size:17px;line-height:1.6}
+.offerStrong{color:#dfb96e;font-size:20px;font-weight:900}
+.qrSection{margin-top:25px}
+.qrTitle{color:#c9a25f;font-weight:900;font-size:17px}
+.qrBox{width:min(70vw,340px);aspect-ratio:1;margin:14px auto;padding:10px;background:#fff;border:4px solid #a57229;border-radius:19px}
+.qr{width:100%;height:100%}
+.personal{margin-top:22px;padding:14px;border-top:1px solid #493318;border-bottom:1px solid #493318;color:#c8b99f;font-size:15px}
+.quote{margin-top:22px;color:#c99c56;font:italic 19px/1.5 Georgia,serif}
+.loading{padding:80px 10px;font-size:18px}
+.invalid{margin:30px 0;padding:20px;background:#32110f;border:1px solid #753c31;border-radius:15px;font-size:18px;font-weight:900}
+@media(max-width:699px){
+  body{padding:14px}
+  .card{width:100%;max-width:620px;padding:22px 16px 28px}
+  .brandThe{font-size:14px}
+  .subtitle{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="top">
+    <button class="back" type="button" onclick="history.length>1 ? history.back() : location.href='./'">←</button>
+    <div class="brand">
+      <div class="brandThe">THE</div>
+      <div class="logo">GENTLEMAN</div>
+      <div class="subtitle">L’élégance à la caribéenne.</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="separator"></div>
+
+  <div id="content" class="loading">Chargement de la carte…</div>
+
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
+
+function safe(value) {
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+const params = new URLSearchParams(location.search);
+const CARD_ID = (params.get("id") || "").trim();
+const CARD_TOKEN = (params.get("token") || "").trim();
+
+function renderCard(data) {
+  const content = document.getElementById("content");
+
+  if (!data || !data.carteExiste) {
+    content.className = "invalid";
+    content.textContent = "❌ CARTE INVALIDE";
+    return;
+  }
+
+  if (data.blocageGeneral) {
+    content.className = "invalid";
+    content.textContent = "⛔ CARTE DÉSACTIVÉE";
+    return;
+  }
+
+  const controlUrl =
+    APPS_SCRIPT_URL +
+    "/bar?id=" +
+    encodeURIComponent(CARD_ID) +
+    "&token=" +
+    encodeURIComponent(CARD_TOKEN);
+
+  const qrUrl =
+    "https://api.qrserver.com/v1/create-qr-code/" +
+    "?size=700x700&margin=10&data=" +
+    encodeURIComponent(controlUrl);
+
+  let statusClass = "statusExpired";
+  let statusText = data.messageEvenement || "Carte inactive";
+
+  if (data.etatEvenement === "EN_COURS") {
+    statusClass = "statusActive";
+    statusText = "✅ CARTE ACTIVE CE SOIR";
+  } else if (data.etatEvenement === "A_VENIR") {
+    statusClass = "statusUpcoming";
+    statusText = "⏳ ACTIVÉE POUR CET ÉVÉNEMENT";
+  } else if (data.etatEvenement === "EXPIREE") {
+    statusText = "ACTIVATION EXPIRÉE";
+  } else if (data.etatEvenement === "NON_ACTIVE") {
+    statusText = "NON ACTIVÉE POUR UN ÉVÉNEMENT";
+  }
+
+  content.className = "";
+
+  content.innerHTML = `
+    <div class="hat">🎩</div>
+
+    <div class="photoFrame">
+      <img src="${safe(data.photo)}" class="photo" alt="Photo du client">
+    </div>
+
+    <div class="pseudo">${safe(data.pseudo)}</div>
+    <div class="number">${safe(data.id)}</div>
+
+    <div class="eventBox">
+      <div class="eventName">${safe(data.evenement || "The Gentleman")}</div>
+      <div class="eventDate">
+        ${data.dateEvenementFR ? "📅 " + safe(data.dateEvenementFR) : ""}
+      </div>
+      <div class="eventStatus ${statusClass}">${safe(statusText)}</div>
+    </div>
+
+    <div class="offer">
+      <span class="offerStrong">1 CONSOMMATION ACHETÉE</span>
+      <br>=<br>
+      <span class="offerStrong">1 CONSOMMATION AU CHOIX OFFERTE</span>
+      <br>
+      À LA FEMME DE VOTRE CHOIX
+    </div>
+
+    <div class="qrSection">
+      <div class="qrTitle">VOTRE QR CODE PERSONNEL</div>
+      <div class="qrBox">
+        <img src="${qrUrl}" class="qr" alt="QR code personnel">
+      </div>
+      <div>À PRÉSENTER AU BAR</div>
+    </div>
+
+    <div class="personal">🔒 CARTE PERSONNELLE • NON CESSIBLE</div>
+
+    <div class="quote">
+      « Être Gentleman, ce n’est pas payer plus.<br>
+      C’est avoir le privilège d’offrir. »
+    </div>
+  `;
+}
+
+function loadCard() {
+  if (!CARD_ID || !CARD_TOKEN) {
+    renderCard(null);
+    return;
+  }
+
+  const callbackName =
+    "__gentlemanCard_" +
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2);
+
+  window[callbackName] = function(data) {
+    try { delete window[callbackName]; } catch (e) {}
+    if (script.parentNode) script.parentNode.removeChild(script);
+    renderCard(data);
+  };
+
+  const script = document.createElement("script");
+  script.src =
+    APPS_SCRIPT_URL +
+    "?pwaCardData=1" +
+    "&id=" + encodeURIComponent(CARD_ID) +
+    "&token=" + encodeURIComponent(CARD_TOKEN) +
+    "&callback=" + encodeURIComponent(callbackName) +
+    "&_=" + Date.now();
+
+  script.onerror = function() {
+    const content = document.getElementById("content");
+    content.className = "invalid";
+    content.textContent = "❌ IMPOSSIBLE DE CHARGER LA CARTE";
+  };
+
+  document.head.appendChild(script);
+}
+
+loadCard();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
+</body>
+</html>

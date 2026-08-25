@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v11-jsonp";
+const CACHE_NAME="gentleman-pwa-v12-card";
 const SHELL=[
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const SHELL=[
   "./manage.html",
   "./scanner.html",
   "./admin.html",
+  "./card.html",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
