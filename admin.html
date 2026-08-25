@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#080603">
-  <title>The Gentleman — Administration</title>
-  <link rel="manifest" href="./manifest.webmanifest">
-  <style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080603">
+<title>The Gentleman — Administration</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
 body{
@@ -29,42 +29,20 @@ h1{font:500 clamp(31px,9vw,44px) Georgia,serif;color:#d3a554;margin:0}
 .tag{font:italic 15px Georgia,serif;color:#bd914d}
 .spacer{width:48px}
 .rule{height:1px;margin:18px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
-.sectionTitle{text-align:center;color:#ddb76d;font-size:22px;font-weight:900;margin:0 0 8px}
-.sectionDesc{text-align:center;color:#9f927f;font-size:14px;line-height:1.5;margin:0 0 20px}
-label{display:block;margin:17px 0 7px;font-weight:900;font-size:15px}
-input{
-  width:100%;min-height:58px;padding:12px 14px;border:2px solid #986523;border-radius:13px;
-  background:#f2eee7;color:#111;font-size:17px
-}
-button{font-family:inherit;cursor:pointer}
-.gold{background:linear-gradient(#dfb35e,#a86e23);color:#160e05;border:0}
-.dark{background:#17130d;color:#d6ad65;border:1px solid #74501f}
-.danger{background:#351111;color:#efb9a4;border:1px solid #784137}
-.action{
-  width:100%;min-height:60px;margin-top:10px;border-radius:13px;font-size:16px;font-weight:900
-}
-.status{
-  margin-top:13px;padding:13px;border:1px solid #68461d;border-radius:13px;background:#15110c;
-  text-align:center;line-height:1.45;color:#cbbda5
-}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.cardItem{
-  padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c
+iframe{
+  display:block;width:100%;border:0;background:transparent;min-height:1150px;
 }
 @media(max-width:699px){
   body{padding:14px}
   .wrap{width:100%;max-width:620px;margin:auto;padding:22px 16px 28px}
-  label{font-size:16px}
-  input{min-height:60px;font-size:18px}
-  .action{min-height:62px;font-size:17px}
+  iframe{min-height:1500px}
 }
 </style>
 </head>
 <body>
-<iframe name="gentlemanBridge" style="display:none;width:0;height:0;border:0"></iframe>
 <div class="wrap">
   <div class="top">
-    <button class="back" type="button" onclick="location.href='./'">←</button>
+    <button class="back" onclick="location.href='./'">←</button>
     <div class="brand">
       <div class="the">THE</div>
       <h1>GENTLEMAN</h1>
@@ -73,162 +51,22 @@ button{font-family:inherit;cursor:pointer}
     <div class="spacer"></div>
   </div>
   <div class="rule"></div>
-
-  <div class="sectionTitle">RÉACTIVER UNE CARTE</div>
-  <div class="sectionDesc">
-    Saisis le numéro de carte, le nouvel événement et sa date.<br>
-    Le QR code et la Gentleman Card restent identiques.
-  </div>
-
-  <label for="cardId">NUMÉRO DE CARTE</label>
-  <input id="cardId" type="text" placeholder="Ex : GC-005">
-
-  <label for="eventName">NOUVEL ÉVÉNEMENT</label>
-  <input id="eventName" type="text" placeholder="Ex : The Gentleman — Octobre">
-
-  <label for="eventDate">DATE DE L’ÉVÉNEMENT</label>
-  <input id="eventDate" type="date">
-
-  <label for="pin">🔐 PIN ADMINISTRATEUR</label>
-  <input id="pin" type="password" inputmode="numeric" placeholder="PIN ADMINISTRATEUR">
-
-  <button class="action gold" type="button" onclick="reactiver()">🔄 RÉACTIVER POUR CET ÉVÉNEMENT</button>
-  <button class="action danger" type="button" onclick="desactiver()">⛔ DÉSACTIVER L’ACTIVATION</button>
-
-  <div id="message" class="status" style="display:none"></div>
+  <iframe id="appFrame" src="https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec/admin" title="Administration" scrolling="no"></iframe>
 </div>
-
 <script>
-
-const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
-const BRIDGE_ORIGIN = "https://punishconcept-create.github.io";
-const bridgePending = new Map();
-
-window.addEventListener("message", function(event) {
-  let allowed = false;
-
-  try {
-    const host = new URL(event.origin).hostname;
-    allowed =
-      host === "script.google.com" ||
-      host === "script.googleusercontent.com" ||
-      host.endsWith(".googleusercontent.com") ||
-      host.endsWith("-script.googleusercontent.com");
-  } catch (e) {}
-
-  if (!allowed) return;
-
-  const payload = event.data || {};
-
-  if (payload.source !== "gentleman-pwa-bridge") return;
-
-  const cb = bridgePending.get(payload.requestId);
-  if (!cb) return;
-
-  bridgePending.delete(payload.requestId);
-  cb(payload.data || {ok:false,message:"Réponse vide"});
+const frame=document.getElementById("appFrame");
+function resizeFrame(){
+  try{
+    const doc=frame.contentDocument || frame.contentWindow.document;
+    const h=Math.max(doc.body.scrollHeight,doc.documentElement.scrollHeight);
+    if(h) frame.style.height=(h+20)+"px";
+  }catch(e){}
+}
+frame.addEventListener("load",function(){
+  setTimeout(resizeFrame,300);
+  setTimeout(resizeFrame,1200);
 });
-
-function bridgeCall(action, fields) {
-  return new Promise(function(resolve) {
-    const requestId =
-      Date.now().toString(36) +
-      Math.random().toString(36).slice(2);
-
-    bridgePending.set(requestId, resolve);
-
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = BRIDGE_URL;
-    form.target = "gentlemanBridge";
-    form.style.display = "none";
-
-    const values = Object.assign(
-      {},
-      fields || {},
-      {
-        bridgeAction: action,
-        requestId: requestId
-      }
-    );
-
-    Object.keys(values).forEach(function(key) {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = key;
-      input.value = values[key] == null ? "" : String(values[key]);
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(function() { form.remove(); }, 1000);
-
-    setTimeout(function() {
-      if (bridgePending.has(requestId)) {
-        bridgePending.delete(requestId);
-        resolve({ok:false,message:"Connexion Apps Script impossible. Vérifie le déploiement puis réessaie."});
-      }
-    }, 30000);
-  });
-}
-
-function showMessage(text){
-  const el=document.getElementById("message");
-  el.style.display="block";
-  el.textContent=text;
-}
-function vals(){
-  return {
-    cardId:document.getElementById("cardId").value.trim().toUpperCase(),
-    evenement:document.getElementById("eventName").value.trim(),
-    dateEvenement:document.getElementById("eventDate").value,
-    pinAdmin:document.getElementById("pin").value.trim()
-  };
-}
-async function reactiver(){
-  const v=vals();
-
-  if(!v.cardId) return showMessage("❌ Saisis le numéro de carte.");
-  if(!v.evenement) return showMessage("❌ Saisis le nouvel événement.");
-  if(!v.dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
-  if(!v.pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
-
-  showMessage("⏳ Réactivation en cours…");
-
-  const data=await bridgeCall("reactivate",v);
-
-  if(!data || !data.ok){
-    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
-  }
-
-  showMessage("✅ "+data.id+" réactivée pour "+data.evenement+" — "+data.dateEvenementFR+".");
-}
-async function desactiver(){
-  const v=vals();
-
-  if(!v.cardId) return showMessage("❌ Saisis le numéro de carte.");
-  if(!v.pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
-
-  if(!confirm("Désactiver l’activation de cette carte ?")) return;
-
-  showMessage("⏳ Désactivation en cours…");
-
-  const data=await bridgeCall("deactivate",{
-    cardId:v.cardId,
-    pinAdmin:v.pinAdmin
-  });
-
-  if(!data || !data.ok){
-    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
-  }
-
-  showMessage("✅ Activation désactivée.");
-}
-
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js");
-}
+if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
 </script>
 </body>
 </html>
