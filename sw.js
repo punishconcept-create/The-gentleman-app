@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v18-client-private-photo";
+const CACHE_NAME="gentleman-pwa-v19-photo-fiable";
 const SHELL=[
   "./",
   "./index.html",
