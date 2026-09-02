@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v24-admin-retour-hotesse-lock";
+const CACHE_NAME="gentleman-pwa-v25-dashboard-sans-gerer-cartes";
 const SHELL=[
   "./",
   "./index.html",
