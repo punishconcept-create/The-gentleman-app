@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v21-pin-creation";
+const CACHE_NAME="gentleman-pwa-v22-admin-pin-manager";
 const SHELL=[
   "./",
   "./index.html",

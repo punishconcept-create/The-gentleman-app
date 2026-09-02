@@ -152,6 +152,36 @@ button{font-family:inherit;cursor:pointer}
     </button>
   </div></div>
 
+  <div id="pinsPanel" style="margin-top:22px;padding:16px;border:1px solid #68461d;
+                            border-radius:15px;background:#15110c">
+    <div class="sectionTitle">GESTION DES PIN</div>
+    <div class="sectionDesc">
+      Laisse un champ vide pour conserver le PIN actuel.
+      Seul le PIN administrateur actuel peut valider un changement.
+    </div>
+
+    <label for="newAdminPin">🔐 NOUVEAU PIN ADMINISTRATION</label>
+    <input id="newAdminPin" type="password" inputmode="numeric" maxlength="8"
+           placeholder="4 à 8 chiffres">
+
+    <label for="newCreatePin">👤 NOUVEAU PIN CRÉATION / HÔTESSE</label>
+    <input id="newCreatePin" type="password" inputmode="numeric" maxlength="8"
+           placeholder="4 à 8 chiffres">
+
+    <label for="newBarPin">🍸 NOUVEAU PIN BAR</label>
+    <input id="newBarPin" type="password" inputmode="numeric" maxlength="8"
+           placeholder="4 à 8 chiffres">
+
+    <button class="action gold" type="button" onclick="enregistrerPins()">
+      🔑 ENREGISTRER LES NOUVEAUX PIN
+    </button>
+
+    <div class="help">
+      Garde de préférence trois PIN différents. Si tu modifies le PIN Admin,
+      le nouveau PIN est automatiquement repris sur cette page.
+    </div>
+  </div>
+
 <script>
 
 
@@ -734,6 +764,105 @@ async function supprimerCarte(){
     chercher();
   },500);
 }
+
+
+async function enregistrerPins(){
+  const pinActuel=pin();
+
+  if(!pinActuel){
+    return showMessage("❌ Saisis d’abord ton PIN administrateur actuel en haut de la page.");
+  }
+
+  const nouveauPinAdmin=
+    document.getElementById("newAdminPin").value.trim();
+
+  const nouveauPinCreation=
+    document.getElementById("newCreatePin").value.trim();
+
+  const nouveauPinBar=
+    document.getElementById("newBarPin").value.trim();
+
+  if(
+    !nouveauPinAdmin &&
+    !nouveauPinCreation &&
+    !nouveauPinBar
+  ){
+    return showMessage("❌ Saisis au moins un nouveau PIN.");
+  }
+
+  const format=/^\d{4,8}$/;
+
+  for(const valeur of [
+    nouveauPinAdmin,
+    nouveauPinCreation,
+    nouveauPinBar
+  ]){
+    if(valeur && !format.test(valeur)){
+      return showMessage("❌ Chaque PIN doit contenir uniquement 4 à 8 chiffres.");
+    }
+  }
+
+  if(
+    nouveauPinAdmin &&
+    nouveauPinAdmin===nouveauPinCreation
+  ){
+    return showMessage("❌ Évite d’utiliser le même PIN pour Admin et Création.");
+  }
+
+  if(
+    nouveauPinAdmin &&
+    nouveauPinAdmin===nouveauPinBar
+  ){
+    return showMessage("❌ Évite d’utiliser le même PIN pour Admin et Bar.");
+  }
+
+  const confirmation=
+    confirm(
+      "Confirmer la modification des PIN sélectionnés ?"
+    );
+
+  if(!confirmation) return;
+
+  showMessage("⏳ Mise à jour des PIN…");
+
+  const data=
+    await bridgeCall(
+      "updatePins",
+      {
+        pinAdminActuel:pinActuel,
+        nouveauPinAdmin,
+        nouveauPinCreation,
+        nouveauPinBar
+      }
+    );
+
+  if(!data || !data.ok){
+    return showMessage(
+      "❌ " +
+      (
+        data
+          ? data.message
+          : "Erreur inconnue"
+      )
+    );
+  }
+
+  document.getElementById("newAdminPin").value="";
+  document.getElementById("newCreatePin").value="";
+  document.getElementById("newBarPin").value="";
+
+  if(nouveauPinAdmin){
+    document.getElementById("pin").value=
+      nouveauPinAdmin;
+
+    showMessage(
+      "✅ PIN mis à jour. Ton nouveau PIN Admin est déjà utilisé sur cette page."
+    );
+  }else{
+    showMessage("✅ PIN mis à jour avec succès.");
+  }
+}
+
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js");
