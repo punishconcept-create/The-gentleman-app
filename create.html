@@ -64,8 +64,8 @@ button{font-family:inherit;cursor:pointer}
 <iframe id="gentlemanBridge" name="gentlemanBridge" style="display:none;width:0;height:0;border:0"></iframe>
 <div class="wrap">
   <div class="top">
-    <button class="back" type="button" onclick="location.href='./'">←</button>
-    <div class="brand">
+    <button id="backBtn" class="back" type="button" style="visibility:hidden" aria-label="Retour">←</button>
+<div class="brand">
       <div class="the">THE</div>
       <h1>GENTLEMAN</h1>
       <div class="tag">Créer une carte</div>
@@ -510,6 +510,20 @@ async function copierLien(){
     prompt("Copie ce lien :",derniereCarte.cardUrl);
   }
 }
+
+
+(function(){
+  const params=new URLSearchParams(window.location.search);
+  const source=(params.get("source")||"").toLowerCase();
+  const backBtn=document.getElementById("backBtn");
+
+  if(backBtn && source==="admin"){
+    backBtn.style.visibility="visible";
+    backBtn.addEventListener("click",function(){
+      location.href="./";
+    });
+  }
+})();
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js");

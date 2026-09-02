@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v22-admin-pin-manager";
+const CACHE_NAME="gentleman-pwa-v24-admin-retour-hotesse-lock";
 const SHELL=[
   "./",
   "./index.html",
