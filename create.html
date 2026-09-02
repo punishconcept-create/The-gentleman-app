@@ -113,8 +113,8 @@ button{font-family:inherit;cursor:pointer}
   <label for="email">✉️ E-MAIL DU CLIENT</label>
   <input id="email" type="email" placeholder="Ex : client@gmail.com">
 
-  <label for="pin">🔐 PIN ADMINISTRATEUR</label>
-  <input id="pin" type="password" inputmode="numeric" placeholder="PIN ADMINISTRATEUR">
+  <label for="pin">🔐 PIN CRÉATION / HÔTESSE</label>
+  <input id="pin" type="password" inputmode="numeric" placeholder="PIN CRÉATION">
 
   <button id="createBtn" class="action gold" type="button" onclick="creerCarte()">
     CRÉER ET ACTIVER LA CARTE
@@ -399,14 +399,18 @@ async function creerCarte(){
   
   if(!dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
   if(!photoBase64) return showMessage("❌ Prends ou importe une photo.");
-  if(!pinAdmin) return showMessage("❌ Saisis le PIN administrateur.");
+  if(!pinAdmin) return showMessage("❌ Saisis le PIN création.");
 
   btn.disabled=true;
   btn.textContent="CRÉATION EN COURS…";
   showMessage("⏳ Création en cours…");
 
   const data=await bridgeCall("create",{
-    pseudo,photoBase64,evenement,dateEvenement,pinAdmin
+    pseudo,
+    photoBase64,
+    evenement,
+    dateEvenement,
+    pinCreation: pinAdmin
   });
 
   btn.disabled=false;

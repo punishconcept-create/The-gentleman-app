@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v20-admin-edit-limit";
+const CACHE_NAME="gentleman-pwa-v21-pin-creation";
 const SHELL=[
   "./",
   "./index.html",
