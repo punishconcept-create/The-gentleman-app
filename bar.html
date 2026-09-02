@@ -554,7 +554,7 @@ function renderCard(data){
         </div>
 
         <div class="value passages">
-          ${Number(data.passages || 0)}
+          ${Number(data.passages || 0)}${Number(data.maxPassages || 0) > 0 ? " / " + Number(data.maxPassages) : " / ∞"}
         </div>
       </div>
 
@@ -836,8 +836,13 @@ async function validerPassageBar(){
   }
 
   message.textContent =
-    "✅ PASSAGE VALIDÉ — N°" +
-    data.passages;
+    "✅ PASSAGE VALIDÉ — " +
+    data.passages +
+    (
+      Number(data.maxPassages || 0) > 0
+        ? "/" + Number(data.maxPassages)
+        : "/∞"
+    );
 
   setTimeout(
     loadCard,

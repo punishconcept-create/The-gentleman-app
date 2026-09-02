@@ -1,4 +1,4 @@
-const CACHE_NAME="gentleman-pwa-v19-photo-fiable";
+const CACHE_NAME="gentleman-pwa-v20-admin-edit-limit";
 const SHELL=[
   "./",
   "./index.html",
