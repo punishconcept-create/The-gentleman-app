@@ -1,4 +1,4 @@
-const CACHE_PREFIX = "gentleman-hotesse-v5-";
+const CACHE_PREFIX = "gentleman-hotesse-v6-";
 const CACHE_NAME = CACHE_PREFIX + "1";
 
 self.addEventListener("install", event => self.skipWaiting());

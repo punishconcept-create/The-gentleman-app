@@ -106,7 +106,7 @@ button{font-family:inherit;cursor:pointer}
       <div class="the">THE</div>
       <h1>GENTLEMAN</h1>
       <div class="tag">Créer une carte</div>
-<div style="margin-top:6px;font-size:11px;font-weight:900;letter-spacing:1.5px;color:#d3a554">HÔTESSE v5</div>
+<div style="margin-top:6px;font-size:11px;font-weight:900;letter-spacing:1.5px;color:#d3a554">HÔTESSE v6</div>
     </div>
     <div class="spacer"></div>
   </div>
@@ -610,7 +610,9 @@ async function reactiverCarteHotesse(){
     '<div style="margin-top:5px">📅 '+safe(data.dateEvenementFR || dateEvenement)+'</div>'+
     (data.emailAuto && data.emailAuto.ok
       ? '<div style="margin-top:7px;color:#9fe3a8;font-weight:800">✉️ E-mail envoyé automatiquement au client</div>'
-      : '<div style="margin-top:7px;color:#cbbda5">Aucun e-mail automatique envoyé.</div>');
+      : '<div style="margin-top:7px;color:#cbbda5">⚠️ E-mail non envoyé'+
+        (data.emailAuto && data.emailAuto.message ? " : "+safe(data.emailAuto.message) : "")+
+        '</div>');
 }
 
 
@@ -823,7 +825,7 @@ async function copierLien(){
 })();
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js?v=5");
+  navigator.serviceWorker.register("./sw.js?v=6");
 }
 </script>
 </body>
