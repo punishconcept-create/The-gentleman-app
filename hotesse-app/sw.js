@@ -1,5 +1,5 @@
-const CACHE_PREFIX = "gentleman-hotesse-v4-";
-const CACHE_NAME = CACHE_PREFIX + "1";
+const CACHE_PREFIX = "gentleman-hotesse-wrapper-";
+const CACHE_NAME = CACHE_PREFIX + "v1";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
@@ -10,7 +10,7 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(k => k.startsWith("gentleman-hotesse-"))
+          .filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE_NAME)
           .map(k => caches.delete(k))
       )
     )
@@ -20,7 +20,9 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+
+  // Le SW Hôtesse n'intercepte que SON propre dossier.
+  if (!url.pathname.startsWith("/The-gentleman-app/hotesse-app/")) return;
 
   if (event.request.mode === "navigate") {
     event.respondWith(
