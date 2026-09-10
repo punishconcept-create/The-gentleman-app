@@ -106,7 +106,7 @@ button{font-family:inherit;cursor:pointer}
       <div class="the">THE</div>
       <h1>GENTLEMAN</h1>
       <div class="tag">Créer une carte</div>
-<div style="margin-top:6px;font-size:11px;font-weight:900;letter-spacing:1.5px;color:#d3a554">HÔTESSE v6</div>
+<div style="margin-top:6px;font-size:11px;font-weight:900;letter-spacing:1.5px;color:#d3a554">HÔTESSE v7</div>
     </div>
     <div class="spacer"></div>
   </div>
@@ -161,7 +161,7 @@ button{font-family:inherit;cursor:pointer}
   <label for="email">✉️ E-MAIL DU CLIENT</label>
   <input id="email" type="email" placeholder="Ex : client@gmail.com">
 
-  <label for="pin">🔐 PIN CRÉATION / HÔTESSE</label>
+  <label id="createPinLabel" for="pin">🔐 PIN CRÉATION / HÔTESSE</label>
   <input id="pin" type="password" inputmode="numeric" placeholder="PIN CRÉATION">
 
   <button id="createBtn" class="action gold" type="button" onclick="creerCarte()">
@@ -180,7 +180,7 @@ button{font-family:inherit;cursor:pointer}
     <label for="searchCard">🔎 RECHERCHE</label>
     <input id="searchCard" type="text" placeholder="Nom/pseudo, N° carte, e-mail ou téléphone (même partiel)">
 
-    <label for="searchPin">🔐 PIN CRÉATION / HÔTESSE</label>
+    <label id="searchPinLabel" for="searchPin">🔐 PIN CRÉATION / HÔTESSE</label>
     <input id="searchPin" type="password" inputmode="numeric" placeholder="PIN CRÉATION">
 
     <button id="searchBtn" class="action gold" type="button" onclick="rechercherCarteHotesse()">
@@ -416,6 +416,49 @@ function bridgeCall(action, fields) {
 }
 
 
+let modeSecuriteHotesse = {
+  charge: false,
+  pinHotesseActif: true
+};
+
+async function chargerModeSecuriteHotesse(){
+  try{
+    const data=await bridgeCall("securityStatus",{});
+    if(!data || !data.ok) return;
+
+    modeSecuriteHotesse.charge=true;
+    modeSecuriteHotesse.pinHotesseActif=Boolean(data.pinHotesseActif);
+
+    const pin=document.getElementById("pin");
+    const pinLabel=document.getElementById("createPinLabel");
+    const searchPin=document.getElementById("searchPin");
+    const searchPinLabel=document.getElementById("searchPinLabel");
+
+    if(!modeSecuriteHotesse.pinHotesseActif){
+      if(pin){
+        pin.value="";
+        pin.style.display="none";
+      }
+      if(pinLabel){
+        pinLabel.textContent="🔓 MODE ÉVÉNEMENT — PIN HÔTESSE DÉSACTIVÉ";
+      }
+
+      if(searchPin){
+        searchPin.value="";
+        searchPin.style.display="none";
+      }
+      if(searchPinLabel){
+        searchPinLabel.textContent="🔓 MODE ÉVÉNEMENT — PIN HÔTESSE DÉSACTIVÉ";
+      }
+    }else{
+      if(pin) pin.style.display="";
+      if(pinLabel) pinLabel.textContent="🔐 PIN CRÉATION / HÔTESSE";
+      if(searchPin) searchPin.style.display="";
+      if(searchPinLabel) searchPinLabel.textContent="🔐 PIN CRÉATION / HÔTESSE";
+    }
+  }catch(e){}
+}
+
 let carteSelectionneeHot = null;
 
 function changerMode(mode){
@@ -452,7 +495,7 @@ async function rechercherCarteHotesse(){
   const btn=document.getElementById("searchBtn");
 
   if(recherche.length<2) return showSearchMessage("❌ Saisis au moins 2 caractères.");
-  if(!pin) return showSearchMessage("❌ Saisis le PIN création / hôtesse.");
+  if(modeSecuriteHotesse.pinHotesseActif && !pin) return showSearchMessage("❌ Saisis le PIN création / hôtesse.");
 
   btn.disabled=true;
   btn.textContent="RECHERCHE…";
@@ -576,7 +619,7 @@ async function reactiverCarteHotesse(){
     return;
   }
 
-  if(!pin){
+  if(modeSecuriteHotesse.pinHotesseActif && !pin){
     msg.style.display="block";
     msg.textContent="❌ Saisis le PIN création / hôtesse.";
     return;
@@ -691,7 +734,7 @@ async function creerCarte(){
   
   if(!dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
   if(!photoBase64) return showMessage("❌ Prends ou importe une photo.");
-  if(!pinAdmin) return showMessage("❌ Saisis le PIN création.");
+  if(modeSecuriteHotesse.pinHotesseActif && !pinAdmin) return showMessage("❌ Saisis le PIN création.");
 
   btn.disabled=true;
   btn.textContent="CRÉATION EN COURS…";
@@ -823,6 +866,8 @@ async function copierLien(){
     });
   }
 })();
+
+chargerModeSecuriteHotesse();
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js?v=6");

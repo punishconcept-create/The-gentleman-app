@@ -51,6 +51,27 @@ button{font-family:inherit;cursor:pointer}
 .cardItem{
   padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c
 }
+.modeEvent{
+  margin:16px 0 20px;padding:15px;border:1px solid #68461d;border-radius:15px;background:#100c07
+}
+.modeEventTitle{
+  font-size:19px;font-weight:900;color:#ddb76d;text-align:center;margin-bottom:5px
+}
+.modeEventDesc{
+  color:#9f927f;text-align:center;font-size:13px;line-height:1.45;margin-bottom:13px
+}
+.modeRow{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 0;border-top:1px solid #342612
+}
+.modeName{font-weight:900;color:#ead8b4}
+.modeState{font-size:12px;color:#9f927f;margin-top:3px}
+.switchBtn{
+  min-width:128px;min-height:48px;border-radius:12px;font-weight:900
+}
+.switchOn{background:#17341f;color:#9fe3a8;border:1px solid #376d45}
+.switchOff{background:#442019;color:#f1b09c;border:1px solid #7f4638}
+
 @media(max-width:699px){
   body{padding:14px}
   .wrap{width:100%;max-width:620px;margin:auto;padding:22px 16px 28px}
@@ -76,6 +97,43 @@ button{font-family:inherit;cursor:pointer}
 
   <label for="pin">🔐 PIN ADMINISTRATEUR</label>
   <input id="pin" type="password" inputmode="numeric" placeholder="PIN ADMINISTRATEUR">
+
+
+  <div class="modeEvent">
+    <div class="modeEventTitle">⚡ MODE ÉVÉNEMENT</div>
+    <div class="modeEventDesc">
+      Désactive temporairement les PIN opérationnels pour accélérer l’accueil et le bar.
+      Le PIN administrateur reste toujours obligatoire.
+    </div>
+
+    <button class="action dark" type="button" onclick="chargerModeEvenementAdmin()">
+      🔄 CHARGER / ACTUALISER LE MODE
+    </button>
+
+    <div id="modeEventControls" style="display:none;margin-top:10px">
+      <div class="modeRow">
+        <div>
+          <div class="modeName">👩‍💼 PIN HÔTESSE</div>
+          <div id="stateHotesse" class="modeState">—</div>
+        </div>
+        <button id="toggleHotesse" class="switchBtn" type="button" onclick="basculerMode('hotesse')">—</button>
+      </div>
+
+      <div class="modeRow">
+        <div>
+          <div class="modeName">🍸 PIN BAR</div>
+          <div id="stateBar" class="modeState">—</div>
+        </div>
+        <button id="toggleBar" class="switchBtn" type="button" onclick="basculerMode('bar')">—</button>
+      </div>
+
+      <button class="action gold" type="button" onclick="reactiverTousLesPins()" style="margin-top:14px">
+        🔒 RÉACTIVER TOUS LES PIN
+      </button>
+
+      <div id="modeEventMessage" class="status" style="display:none"></div>
+    </div>
+  </div>
 
   <label for="search">🔎 RECHERCHER UNE CARTE</label>
   <input id="search" type="text" placeholder="GC-005, pseudo, événement…">
@@ -354,6 +412,129 @@ function bridgeCall(action, fields) {
     );
 
   });
+}
+
+let modeEvenementAdmin = {
+  pinHotesseActif: true,
+  pinBarActif: true,
+  charge: false
+};
+
+function showModeEventMessage(text){
+  const el=document.getElementById("modeEventMessage");
+  el.style.display="block";
+  el.textContent=text;
+}
+
+function afficherModeEvenement(){
+  const controls=document.getElementById("modeEventControls");
+  const stateH=document.getElementById("stateHotesse");
+  const stateB=document.getElementById("stateBar");
+  const btnH=document.getElementById("toggleHotesse");
+  const btnB=document.getElementById("toggleBar");
+
+  controls.style.display="block";
+
+  stateH.textContent=
+    modeEvenementAdmin.pinHotesseActif
+      ? "🔐 PIN demandé"
+      : "🔓 Sans PIN";
+
+  stateB.textContent=
+    modeEvenementAdmin.pinBarActif
+      ? "🔐 PIN demandé"
+      : "🔓 Sans PIN";
+
+  btnH.textContent=
+    modeEvenementAdmin.pinHotesseActif
+      ? "DÉSACTIVER"
+      : "RÉACTIVER";
+
+  btnB.textContent=
+    modeEvenementAdmin.pinBarActif
+      ? "DÉSACTIVER"
+      : "RÉACTIVER";
+
+  btnH.className=
+    "switchBtn " +
+    (modeEvenementAdmin.pinHotesseActif ? "switchOn" : "switchOff");
+
+  btnB.className=
+    "switchBtn " +
+    (modeEvenementAdmin.pinBarActif ? "switchOn" : "switchOff");
+}
+
+async function chargerModeEvenementAdmin(){
+  if(!pin()){
+    return showModeEventMessage("❌ Saisis d’abord le PIN administrateur.");
+  }
+
+  showModeEventMessage("⏳ Chargement…");
+
+  const data=await bridgeCall("securityStatusAdmin",{
+    pinAdmin:pin()
+  });
+
+  if(!data || !data.ok){
+    return showModeEventMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  modeEvenementAdmin.pinHotesseActif=Boolean(data.pinHotesseActif);
+  modeEvenementAdmin.pinBarActif=Boolean(data.pinBarActif);
+  modeEvenementAdmin.charge=true;
+
+  afficherModeEvenement();
+  showModeEventMessage("✅ Mode événement chargé.");
+}
+
+async function enregistrerModeEvenement(){
+  showModeEventMessage("⏳ Mise à jour…");
+
+  const data=await bridgeCall("securityModeUpdate",{
+    pinAdmin:pin(),
+    pinHotesseActif:modeEvenementAdmin.pinHotesseActif,
+    pinBarActif:modeEvenementAdmin.pinBarActif
+  });
+
+  if(!data || !data.ok){
+    return showModeEventMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  modeEvenementAdmin.pinHotesseActif=Boolean(data.pinHotesseActif);
+  modeEvenementAdmin.pinBarActif=Boolean(data.pinBarActif);
+  afficherModeEvenement();
+
+  showModeEventMessage(
+    "✅ Hôtesse : "+
+    (modeEvenementAdmin.pinHotesseActif ? "PIN ACTIF" : "SANS PIN")+
+    " • Bar : "+
+    (modeEvenementAdmin.pinBarActif ? "PIN ACTIF" : "SANS PIN")
+  );
+}
+
+async function basculerMode(type){
+  if(!modeEvenementAdmin.charge){
+    await chargerModeEvenementAdmin();
+    if(!modeEvenementAdmin.charge) return;
+  }
+
+  if(type==="hotesse"){
+    modeEvenementAdmin.pinHotesseActif=!modeEvenementAdmin.pinHotesseActif;
+  }else if(type==="bar"){
+    modeEvenementAdmin.pinBarActif=!modeEvenementAdmin.pinBarActif;
+  }
+
+  await enregistrerModeEvenement();
+}
+
+async function reactiverTousLesPins(){
+  if(!confirm("Réactiver le PIN Hôtesse ET le PIN Bar ?")) return;
+
+  modeEvenementAdmin.pinHotesseActif=true;
+  modeEvenementAdmin.pinBarActif=true;
+  modeEvenementAdmin.charge=true;
+
+  await enregistrerModeEvenement();
 }
 
 let selectedId="";

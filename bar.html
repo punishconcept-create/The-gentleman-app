@@ -518,6 +518,7 @@ function renderCard(data){
   if(data.evenementActif){
     validationHtml = `
       <div class="bar">
+        <div id="pinBarBlock">
         <input
           id="pinBar"
           type="password"
@@ -525,6 +526,11 @@ function renderCard(data){
           autocomplete="off"
           placeholder="PIN BAR"
         >
+        </div>
+
+        <div id="pinBarOff" style="display:none;margin:0 0 10px;padding:10px;border:1px solid #6d4b22;border-radius:12px;color:#d6ad65;text-align:center;font-weight:900">
+          🔓 MODE ÉVÉNEMENT — PIN BAR DÉSACTIVÉ
+        </div>
 
         <button
           class="action"
@@ -613,6 +619,8 @@ function renderCard(data){
 
     ${validationHtml}
   `;
+
+  setTimeout(chargerModeSecuriteBar,0);
 }
 
 
@@ -833,6 +841,34 @@ function bridgeCall(
   );
 }
 
+
+let modeSecuriteBar = {
+  charge: false,
+  pinBarActif: true
+};
+
+async function chargerModeSecuriteBar(){
+  try{
+    const data=await bridgeCall("securityStatus",{});
+    if(!data || !data.ok) return;
+
+    modeSecuriteBar.charge=true;
+    modeSecuriteBar.pinBarActif=Boolean(data.pinBarActif);
+
+    const block=document.getElementById("pinBarBlock");
+    const off=document.getElementById("pinBarOff");
+    const input=document.getElementById("pinBar");
+
+    if(!modeSecuriteBar.pinBarActif){
+      if(input) input.value="";
+      if(block) block.style.display="none";
+      if(off) off.style.display="block";
+    }else{
+      if(block) block.style.display="";
+      if(off) off.style.display="none";
+    }
+  }catch(e){}
+}
 
 async function validerPassageBar(){
   const pin =
