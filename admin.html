@@ -80,6 +80,17 @@ button{font-family:inherit;cursor:pointer}
   input{min-height:60px;font-size:18px}
   .action{min-height:62px;font-size:17px}
 }
+
+.eventModeGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.eventModeCard{
+  padding:14px;border:1px solid #68461d;border-radius:14px;background:#0e0b07;text-align:center
+}
+.eventModeLabel{font-weight:900;font-size:16px;color:#ead8b4;margin-bottom:10px}
+.modeBtn{width:100%;min-height:58px;border-radius:13px;font-size:15px;font-weight:900}
+.modeOn{background:#17331d;color:#bff0c7;border:1px solid #3e7548}
+.modeOff{background:#3a2110;color:#ffd59a;border:1px solid #8b5b24}
+@media(max-width:520px){.eventModeGrid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -151,6 +162,41 @@ button{font-family:inherit;cursor:pointer}
       🗑️ SUPPRIMER DÉFINITIVEMENT LA CARTE
     </button>
   </div></div>
+
+
+  <div id="eventModePanel" style="margin-top:22px;padding:16px;border:1px solid #68461d;
+                                  border-radius:15px;background:#15110c">
+    <div class="sectionTitle">⚡ MODE ÉVÉNEMENT</div>
+    <div class="sectionDesc">
+      Désactive temporairement un PIN pour accélérer le service pendant l’événement.
+      Le PIN administrateur reste obligatoire pour modifier ces réglages.
+    </div>
+
+    <div class="eventModeGrid">
+      <div class="eventModeCard">
+        <div class="eventModeLabel">👤 ACCÈS HÔTESSE</div>
+        <button id="hostessModeBtn" class="modeBtn modeOn" type="button" onclick="basculerModeEvenement('hostess')">
+          🔐 PIN ACTIF
+        </button>
+      </div>
+
+      <div class="eventModeCard">
+        <div class="eventModeLabel">🍸 ACCÈS BAR</div>
+        <button id="barModeBtn" class="modeBtn modeOn" type="button" onclick="basculerModeEvenement('bar')">
+          🔐 PIN ACTIF
+        </button>
+      </div>
+    </div>
+
+    <button class="action dark" type="button" onclick="chargerModeEvenement()">
+      🔄 ACTUALISER L’ÉTAT
+    </button>
+    <button class="action gold" type="button" onclick="reactiverTousLesPins()">
+      🔒 RÉACTIVER TOUS LES PIN
+    </button>
+
+    <div id="eventModeStatus" class="status">Saisis ton PIN Admin puis actualise l’état.</div>
+  </div>
 
   <div id="pinsPanel" style="margin-top:22px;padding:16px;border:1px solid #68461d;
                             border-radius:15px;background:#15110c">
@@ -861,6 +907,135 @@ async function enregistrerPins(){
   }else{
     showMessage("✅ PIN mis à jour avec succès.");
   }
+}
+
+
+
+/* =========================================================
+   MODE ÉVÉNEMENT
+   Actions attendues côté Apps Script :
+   - getEventPinMode
+   - setEventPinMode
+   ========================================================= */
+
+let eventPinMode = {
+  hostessPinRequired: true,
+  barPinRequired: true
+};
+
+function eventModeMessage(message){
+  const el = document.getElementById("eventModeStatus");
+  if(el) el.textContent = message;
+}
+
+function dessinerModeEvenement(){
+  const hostess = document.getElementById("hostessModeBtn");
+  const bar = document.getElementById("barModeBtn");
+
+  if(hostess){
+    hostess.className = "modeBtn " + (eventPinMode.hostessPinRequired ? "modeOn" : "modeOff");
+    hostess.textContent = eventPinMode.hostessPinRequired ? "🔐 PIN ACTIF" : "🔓 SANS PIN";
+  }
+
+  if(bar){
+    bar.className = "modeBtn " + (eventPinMode.barPinRequired ? "modeOn" : "modeOff");
+    bar.textContent = eventPinMode.barPinRequired ? "🔐 PIN ACTIF" : "🔓 SANS PIN";
+  }
+}
+
+async function chargerModeEvenement(){
+  if(!pin()){
+    eventModeMessage("⚠️ Saisis d’abord le PIN administrateur en haut de la page.");
+    return;
+  }
+
+  eventModeMessage("⏳ Lecture du mode événement…");
+
+  const data = await bridgeCall("getEventPinMode", {
+    pinAdmin: pin()
+  });
+
+  if(!data || !data.ok){
+    eventModeMessage("❌ " + (data ? data.message : "Impossible de lire le mode événement."));
+    return;
+  }
+
+  eventPinMode.hostessPinRequired = data.hostessPinRequired !== false;
+  eventPinMode.barPinRequired = data.barPinRequired !== false;
+  dessinerModeEvenement();
+  eventModeMessage("✅ État du mode événement actualisé.");
+}
+
+async function basculerModeEvenement(type){
+  if(!pin()){
+    eventModeMessage("⚠️ Saisis d’abord le PIN administrateur en haut de la page.");
+    return;
+  }
+
+  const isHostess = type === "hostess";
+  const actuel = isHostess ? eventPinMode.hostessPinRequired : eventPinMode.barPinRequired;
+  const nouveau = !actuel;
+  const nom = isHostess ? "Hôtesse" : "Bar";
+
+  const confirmation = confirm(
+    nouveau
+      ? "Réactiver le PIN " + nom + " ?"
+      : "Passer l’accès " + nom + " en SANS PIN pour l’événement ?"
+  );
+  if(!confirmation) return;
+
+  eventModeMessage("⏳ Mise à jour de l’accès " + nom + "…");
+
+  const fields = {
+    pinAdmin: pin(),
+    hostessPinRequired: eventPinMode.hostessPinRequired ? "1" : "0",
+    barPinRequired: eventPinMode.barPinRequired ? "1" : "0"
+  };
+
+  if(isHostess){
+    fields.hostessPinRequired = nouveau ? "1" : "0";
+  }else{
+    fields.barPinRequired = nouveau ? "1" : "0";
+  }
+
+  const data = await bridgeCall("setEventPinMode", fields);
+
+  if(!data || !data.ok){
+    eventModeMessage("❌ " + (data ? data.message : "La modification n’a pas été confirmée."));
+    return;
+  }
+
+  eventPinMode.hostessPinRequired = data.hostessPinRequired !== false;
+  eventPinMode.barPinRequired = data.barPinRequired !== false;
+  dessinerModeEvenement();
+  eventModeMessage("✅ Mode " + nom + " mis à jour.");
+}
+
+async function reactiverTousLesPins(){
+  if(!pin()){
+    eventModeMessage("⚠️ Saisis d’abord le PIN administrateur en haut de la page.");
+    return;
+  }
+
+  if(!confirm("Réactiver le PIN Hôtesse ET le PIN Bar ?")) return;
+
+  eventModeMessage("⏳ Réactivation de tous les PIN…");
+
+  const data = await bridgeCall("setEventPinMode", {
+    pinAdmin: pin(),
+    hostessPinRequired: "1",
+    barPinRequired: "1"
+  });
+
+  if(!data || !data.ok){
+    eventModeMessage("❌ " + (data ? data.message : "La modification n’a pas été confirmée."));
+    return;
+  }
+
+  eventPinMode.hostessPinRequired = true;
+  eventPinMode.barPinRequired = true;
+  dessinerModeEvenement();
+  eventModeMessage("✅ PIN Hôtesse et PIN Bar réactivés.");
 }
 
 
