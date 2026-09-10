@@ -883,7 +883,10 @@ async function validerPassageBar(){
       "message"
     );
 
-  if(!pin.trim()){
+  // Le PIN n'est obligatoire que lorsque le mode sécurité Bar est actif.
+  // En MODE ÉVÉNEMENT sans PIN, on envoie volontairement une valeur vide
+  // au backend, qui autorise alors directement le passage.
+  if(modeSecuriteBar.pinBarActif && !pin.trim()){
     message.textContent =
       "❌ Entre le PIN BAR.";
     return;
