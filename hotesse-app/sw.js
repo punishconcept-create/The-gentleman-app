@@ -1,16 +1,7 @@
-const CACHE_PREFIX = "gentleman-hotesse-original-";
-const CACHE_NAME = CACHE_PREFIX + "v1";
-
-const SHELL = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest"
-];
+const CACHE_PREFIX = "gentleman-hotesse-v4-";
+const CACHE_NAME = CACHE_PREFIX + "1";
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL))
-  );
   self.skipWaiting();
 });
 
@@ -19,8 +10,8 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
-          .map(key => caches.delete(key))
+          .filter(k => k.startsWith("gentleman-hotesse-"))
+          .map(k => caches.delete(k))
       )
     )
   );
@@ -28,22 +19,13 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  const request = event.request;
-  const url = new URL(request.url);
-
-  // Ne jamais intercepter Google Apps Script ou un autre domaine.
+  const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === "navigate") {
+  if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(request, { cache: "no-store" })
+      fetch(event.request, {cache:"no-store"})
         .catch(() => caches.match("./index.html"))
     );
-    return;
   }
-
-  event.respondWith(
-    fetch(request, { cache: "no-store" })
-      .catch(() => caches.match(request))
-  );
 });
