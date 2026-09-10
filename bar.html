@@ -304,6 +304,57 @@ input{
 ></iframe>
 
 <script>
+
+// ============================================================
+// MAINTIEN DE L'ÉCRAN ALLUMÉ — MODE ÉVÉNEMENT
+// ============================================================
+let gentlemanWakeLock = null;
+
+async function maintenirEcranAllume() {
+  if (!("wakeLock" in navigator)) {
+    console.log("Wake Lock non pris en charge sur cet appareil.");
+    return;
+  }
+
+  // Ne demande le Wake Lock que si la page est réellement visible.
+  if (document.visibilityState !== "visible") {
+    return;
+  }
+
+  try {
+    // Évite de multiplier les demandes si le verrou est déjà actif.
+    if (gentlemanWakeLock && !gentlemanWakeLock.released) {
+      return;
+    }
+
+    gentlemanWakeLock = await navigator.wakeLock.request("screen");
+
+    console.log("🔆 Écran maintenu allumé");
+
+    gentlemanWakeLock.addEventListener("release", function() {
+      console.log("Wake Lock libéré");
+    });
+
+  } catch (err) {
+    console.log("Impossible d'activer Wake Lock :", err);
+  }
+}
+
+// Active le maintien d'écran dès l'ouverture de la page.
+window.addEventListener("load", function() {
+  maintenirEcranAllume();
+});
+
+// Android/Chrome peut libérer automatiquement le Wake Lock
+// lorsqu'on change d'application ou d'onglet.
+// On le redemande automatiquement dès que Gentleman revient au premier plan.
+document.addEventListener("visibilitychange", function() {
+  if (document.visibilityState === "visible") {
+    maintenirEcranAllume();
+  }
+});
+
+
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
 
 const params =

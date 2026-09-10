@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080603">
+  <title>The Gentleman — Gérer les cartes</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#080603;color:#ead8b4;font-family:Arial,Helvetica,sans-serif}
+body{
+  min-height:100vh;min-height:100dvh;padding:14px;
+  background:radial-gradient(circle at 80% 5%,rgba(177,116,34,.18),transparent 31%),
+             linear-gradient(150deg,#020202,#090704 70%,#171006)
+}
+.wrap{
+  width:100%;max-width:620px;margin:auto;padding:22px 16px 28px;border:2px solid #9b6728;border-radius:24px;
+  background:linear-gradient(155deg,#070707,#100c07 72%,#090603)
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{
+  width:48px;height:48px;border-radius:14px;border:1px solid #68461d;background:#15110c;color:#e1bf82;
+  font-size:22px;font-weight:900
+}
+.brand{flex:1;text-align:center}
+.the{font:12px Georgia,serif;letter-spacing:7px;color:#cda45e}
+h1{font:500 clamp(31px,9vw,44px) Georgia,serif;color:#d3a554;margin:0}
+.tag{font:italic 15px Georgia,serif;color:#bd914d}
+.spacer{width:48px}
+.rule{height:1px;margin:18px auto;width:72%;background:linear-gradient(90deg,transparent,#956126,transparent)}
+.sectionTitle{text-align:center;color:#ddb76d;font-size:22px;font-weight:900;margin:0 0 8px}
+.sectionDesc{text-align:center;color:#9f927f;font-size:14px;line-height:1.5;margin:0 0 20px}
+label{display:block;margin:17px 0 7px;font-weight:900;font-size:15px}
+input{
+  width:100%;min-height:58px;padding:12px 14px;border:2px solid #986523;border-radius:13px;
+  background:#f2eee7;color:#111;font-size:17px
+}
+button{font-family:inherit;cursor:pointer}
+.gold{background:linear-gradient(#dfb35e,#a86e23);color:#160e05;border:0}
+.dark{background:#17130d;color:#d6ad65;border:1px solid #74501f}
+.danger{background:#351111;color:#efb9a4;border:1px solid #784137}
+.action{
+  width:100%;min-height:60px;margin-top:10px;border-radius:13px;font-size:16px;font-weight:900
+}
+.status{
+  margin-top:13px;padding:13px;border:1px solid #68461d;border-radius:13px;background:#15110c;
+  text-align:center;line-height:1.45;color:#cbbda5
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cardItem{
+  padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c
+}
+@media(max-width:699px){
+  body{padding:14px}
+  .wrap{width:100%;max-width:620px;margin:auto;padding:22px 16px 28px}
+  label{font-size:16px}
+  input{min-height:60px;font-size:18px}
+  .action{min-height:62px;font-size:17px}
+}
+</style>
+</head>
+<body>
+<iframe id="gentlemanBridge" name="gentlemanBridge" style="display:none;width:0;height:0;border:0"></iframe>
+<div class="wrap">
+  <div class="top">
+    <button class="back" type="button" onclick="location.href='./'">←</button>
+    <div class="brand">
+      <div class="the">THE</div>
+      <h1>GENTLEMAN</h1>
+      <div class="tag">Gérer les cartes</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+  <div class="rule"></div>
+
+  <label for="pin">🔐 PIN ADMINISTRATEUR</label>
+  <input id="pin" type="password" inputmode="numeric" placeholder="PIN ADMINISTRATEUR">
+
+  <label for="search">🔎 RECHERCHER UNE CARTE</label>
+  <input id="search" type="text" placeholder="GC-005, pseudo, événement…">
+
+  <div class="grid2" style="margin-top:10px">
+    <button class="action gold" type="button" onclick="chercher()">🔎 RECHERCHER</button>
+    <button class="action dark" type="button" onclick="toutAfficher()">📋 TOUT AFFICHER</button>
+  </div>
+
+  <div id="message" class="status" style="display:none"></div>
+  <div id="list" style="display:grid;gap:12px;margin-top:16px"></div>
+
+  <div id="editor" style="display:none;margin-top:18px;padding:16px;border:1px solid #68461d;
+                         border-radius:15px;background:#15110c">
+    <div class="sectionTitle">MODIFIER L’ACTIVATION</div>
+    <div id="selected" class="sectionDesc"></div>
+
+    <label for="eventName">ÉVÉNEMENT</label>
+    <input id="eventName" type="text" placeholder="Ex : The Gentleman — Octobre">
+
+    <label for="eventDate">DATE DE L’ÉVÉNEMENT</label>
+    <input id="eventDate" type="date">
+
+    <button class="action gold" type="button" onclick="reactiver()">🔄 RÉACTIVER LA CARTE</button>
+    <button class="action danger" type="button" onclick="desactiver()">⛔ DÉSACTIVER L’ACTIVATION</button>
+  </div>
+</div>
+
+<script>
+
+// ============================================================
+// MAINTIEN DE L'ÉCRAN ALLUMÉ — MODE ÉVÉNEMENT
+// ============================================================
+let gentlemanWakeLock = null;
+
+async function maintenirEcranAllume() {
+  if (!("wakeLock" in navigator)) {
+    console.log("Wake Lock non pris en charge sur cet appareil.");
+    return;
+  }
+
+  // Ne demande le Wake Lock que si la page est réellement visible.
+  if (document.visibilityState !== "visible") {
+    return;
+  }
+
+  try {
+    // Évite de multiplier les demandes si le verrou est déjà actif.
+    if (gentlemanWakeLock && !gentlemanWakeLock.released) {
+      return;
+    }
+
+    gentlemanWakeLock = await navigator.wakeLock.request("screen");
+
+    console.log("🔆 Écran maintenu allumé");
+
+    gentlemanWakeLock.addEventListener("release", function() {
+      console.log("Wake Lock libéré");
+    });
+
+  } catch (err) {
+    console.log("Impossible d'activer Wake Lock :", err);
+  }
+}
+
+// Active le maintien d'écran dès l'ouverture de la page.
+window.addEventListener("load", function() {
+  maintenirEcranAllume();
+});
+
+// Android/Chrome peut libérer automatiquement le Wake Lock
+// lorsqu'on change d'application ou d'onglet.
+// On le redemande automatiquement dès que Gentleman revient au premier plan.
+document.addEventListener("visibilitychange", function() {
+  if (document.visibilityState === "visible") {
+    maintenirEcranAllume();
+  }
+});
+
+
+
+
+
+const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbxeJnzsyuEIrMjleUmabRIEuoGU2JXbzwewxOrCu9l_hGl1Bla3R6Gg39cjt32ajr4g/exec";
+const BRIDGE_TIMEOUT = 45000;
+
+function bridgeCall(action, fields) {
+  return new Promise(function(resolve) {
+
+    const requestId =
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2);
+
+    let finished = false;
+    let currentScript = null;
+
+    function finish(data) {
+      if (finished) return;
+      finished = true;
+
+      if (
+        currentScript &&
+        currentScript.parentNode
+      ) {
+        currentScript.parentNode.removeChild(
+          currentScript
+        );
+      }
+
+      resolve(
+        data || {
+          ok: false,
+          message: "Réponse serveur vide."
+        }
+      );
+    }
+
+    function poll() {
+      if (finished) return;
+
+      const callbackName =
+        "__gentlemanPoll_" +
+        requestId.replace(
+          /[^A-Za-z0-9_$]/g,
+          ""
+        );
+
+      window[callbackName] =
+        function(payload) {
+
+          try {
+            delete window[callbackName];
+          } catch (e) {
+            window[callbackName] = undefined;
+          }
+
+          if (
+            currentScript &&
+            currentScript.parentNode
+          ) {
+            currentScript.parentNode
+              .removeChild(currentScript);
+          }
+
+          currentScript = null;
+
+          if (
+            payload &&
+            payload.ready
+          ) {
+            finish(payload.data);
+            return;
+          }
+
+          if (!finished) {
+            setTimeout(
+              poll,
+              650
+            );
+          }
+        };
+
+      currentScript =
+        document.createElement("script");
+
+      currentScript.src =
+        BRIDGE_URL +
+        "?bridgePoll=" +
+        encodeURIComponent(requestId) +
+        "&callback=" +
+        encodeURIComponent(callbackName) +
+        "&_=" +
+        Date.now();
+
+      currentScript.onerror =
+        function() {
+
+          try {
+            delete window[callbackName];
+          } catch (e) {}
+
+          if (
+            currentScript &&
+            currentScript.parentNode
+          ) {
+            currentScript.parentNode
+              .removeChild(currentScript);
+          }
+
+          currentScript = null;
+
+          if (!finished) {
+            setTimeout(
+              poll,
+              1000
+            );
+          }
+        };
+
+      document.head.appendChild(
+        currentScript
+      );
+    }
+
+
+    const form =
+      document.createElement("form");
+
+    form.method = "POST";
+    form.action = BRIDGE_URL;
+    form.target = "gentlemanBridge";
+    form.style.display = "none";
+
+
+    const values =
+      Object.assign(
+        {},
+        fields || {},
+        {
+          bridgeAction: action,
+          requestId: requestId
+        }
+      );
+
+
+    Object.keys(values)
+      .forEach(function(key) {
+
+        const input =
+          document.createElement("input");
+
+        input.type = "hidden";
+        input.name = key;
+
+        input.value =
+          values[key] == null
+            ? ""
+            : String(values[key]);
+
+        form.appendChild(input);
+      });
+
+
+    document.body.appendChild(form);
+
+    form.submit();
+
+
+    setTimeout(
+      function() {
+        form.remove();
+      },
+      1200
+    );
+
+
+    setTimeout(
+      poll,
+      700
+    );
+
+
+    setTimeout(
+      function() {
+
+        if (!finished) {
+          finish({
+            ok: false,
+            message:
+              "Le serveur n’a pas confirmé l’opération."
+          });
+        }
+
+      },
+      BRIDGE_TIMEOUT
+    );
+
+  });
+}
+
+let selectedId="";
+
+function safe(v){
+  return String(v||"")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function pin(){
+  return document.getElementById("pin").value.trim();
+}
+function showMessage(text){
+  const el=document.getElementById("message");
+  el.style.display="block";
+  el.textContent=text;
+}
+function chercher(){
+  lancer(document.getElementById("search").value.trim());
+}
+function toutAfficher(){
+  document.getElementById("search").value="";
+  lancer("");
+}
+async function lancer(q){
+  if(!pin()) return showMessage("⚠️ Saisis le PIN administrateur.");
+
+  showMessage("⏳ Recherche en cours…");
+  document.getElementById("list").innerHTML="";
+
+  const data=await bridgeCall("search",{
+    recherche:q,
+    pinAdmin:pin()
+  });
+
+  if(!data || !data.ok){
+    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  showMessage(data.cartes.length ? data.cartes.length+" carte(s) trouvée(s)." : "Aucune carte trouvée.");
+  afficher(data.cartes);
+}
+function afficher(cartes){
+  const list=document.getElementById("list");
+  list.innerHTML="";
+
+  cartes.forEach(function(c){
+    const item=document.createElement("div");
+    item.className="cardItem";
+
+    let badge="⛔ Inactive";
+    if(c.evenementActif) badge="✅ Active";
+    else if(c.etatEvenement==="A_VENIR") badge="⏳ À venir";
+
+    item.innerHTML=`
+      <div style="display:flex;gap:12px;align-items:center">
+        <img src="${safe(c.photo)}" alt="Photo du client"
+             style="width:82px;height:82px;object-fit:cover;border:2px solid #a6752d;border-radius:14px">
+        <div style="flex:1">
+          <div style="font-size:22px;font-weight:900">${safe(c.pseudo)}</div>
+          <div style="color:#d0a15a;font-weight:900">${safe(c.id)}</div>
+          <div style="margin-top:4px;font-size:14px;color:#cbbda7">${safe(c.evenement||"Aucun événement")}</div>
+          <div style="font-size:13px;color:#9f927f">${safe(c.dateEvenementFR||"")}</div>
+          <div style="margin-top:5px;font-weight:900">${badge}</div>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <button class="action gold manageBtn">⚙️ GÉRER</button>
+        <button class="action dark viewBtn">🎩 VOIR LA CARTE</button>
+      </div>
+    `;
+
+    item.querySelector(".manageBtn").onclick=function(){
+      choisir(c.id,c.evenement||"",c.dateEvenement||"");
+    };
+    item.querySelector(".viewBtn").onclick=function(){
+      window.open(c.cardUrl,"_blank");
+    };
+
+    list.appendChild(item);
+  });
+}
+function choisir(id,evt,date){
+  selectedId=id;
+  document.getElementById("selected").textContent="Carte "+id;
+  document.getElementById("eventName").value=evt||"";
+  document.getElementById("eventDate").value=date||"";
+  const editor=document.getElementById("editor");
+  editor.style.display="block";
+  editor.scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function reactiver(){
+  const evenement=document.getElementById("eventName").value.trim();
+  const dateEvenement=document.getElementById("eventDate").value;
+
+  if(!selectedId) return showMessage("❌ Sélectionne une carte.");
+  if(!evenement) return showMessage("❌ Saisis le nouvel événement.");
+  if(!dateEvenement) return showMessage("❌ Choisis la date de l’événement.");
+
+  showMessage("⏳ Réactivation en cours…");
+
+  const data=await bridgeCall("reactivate",{
+    cardId:selectedId,
+    evenement,
+    dateEvenement,
+    pinAdmin:pin()
+  });
+
+  if(!data || !data.ok){
+    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  showMessage("✅ "+data.id+" réactivée pour "+data.evenement+" — "+data.dateEvenementFR+".");
+  document.getElementById("editor").style.display="none";
+  chercher();
+}
+async function desactiver(){
+  if(!selectedId) return showMessage("❌ Sélectionne une carte.");
+  if(!confirm("Désactiver l’activation de cette carte ?")) return;
+
+  showMessage("⏳ Désactivation en cours…");
+
+  const data=await bridgeCall("deactivate",{
+    cardId:selectedId,
+    pinAdmin:pin()
+  });
+
+  if(!data || !data.ok){
+    return showMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  showMessage("✅ Activation désactivée.");
+  document.getElementById("editor").style.display="none";
+  chercher();
+}
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
+</body>
+</html>
