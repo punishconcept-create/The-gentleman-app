@@ -1,0 +1,25 @@
+{
+  "id": "/The-gentleman-app/create-app/",
+  "name": "The Gentleman — Créer une carte",
+  "short_name": "Créer carte",
+  "start_url": "/The-gentleman-app/create-app/",
+  "scope": "/The-gentleman-app/create-app/",
+  "display": "standalone",
+  "background_color": "#080603",
+  "theme_color": "#080603",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
