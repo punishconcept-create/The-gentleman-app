@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "gentleman-hotesse-";
-const CACHE_NAME = CACHE_PREFIX + "v2";
+const CACHE_NAME = CACHE_PREFIX + "v3";
 
 const SHELL = [
   "./",
@@ -19,7 +19,10 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .filter(key =>
+            key.startsWith(CACHE_PREFIX) &&
+            key !== CACHE_NAME
+          )
           .map(key => caches.delete(key))
       )
     )
@@ -38,7 +41,8 @@ self.addEventListener("fetch", event => {
       fetch(request, { cache: "no-store" })
         .then(response => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy));
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put("./index.html", copy));
           return response;
         })
         .catch(() => caches.match("./index.html"))
@@ -47,6 +51,7 @@ self.addEventListener("fetch", event => {
   }
 
   event.respondWith(
-    fetch(request).catch(() => caches.match(request))
+    fetch(request, { cache: "no-store" })
+      .catch(() => caches.match(request))
   );
 });
