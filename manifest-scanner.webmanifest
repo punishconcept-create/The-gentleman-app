@@ -1,0 +1,26 @@
+{
+  "id": "/The-gentleman-app/scanner-app",
+  "name": "The Gentleman — Scanner Bar",
+  "short_name": "Scanner Bar",
+  "description": "Scanner des cartes The Gentleman au bar",
+  "start_url": "./scanner.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080603",
+  "theme_color": "#080603",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/scanner-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/scanner-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
