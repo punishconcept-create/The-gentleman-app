@@ -2,7 +2,7 @@
   "id": "/The-gentleman-app/hotesse-app/",
   "name": "The Gentleman — Hôtesse",
   "short_name": "Gentleman Hôtesse",
-  "start_url": "/The-gentleman-app/hotesse-app/?v=3",
+  "start_url": "/The-gentleman-app/hotesse-app/",
   "scope": "/The-gentleman-app/hotesse-app/",
   "display": "standalone",
   "background_color": "#080603",

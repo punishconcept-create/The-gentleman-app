@@ -1,5 +1,5 @@
-const CACHE_PREFIX = "gentleman-hotesse-";
-const CACHE_NAME = CACHE_PREFIX + "v3";
+const CACHE_PREFIX = "gentleman-hotesse-original-";
+const CACHE_NAME = CACHE_PREFIX + "v1";
 
 const SHELL = [
   "./",
@@ -19,10 +19,7 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key =>
-            key.startsWith(CACHE_PREFIX) &&
-            key !== CACHE_NAME
-          )
+          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
           .map(key => caches.delete(key))
       )
     )
@@ -34,17 +31,12 @@ self.addEventListener("fetch", event => {
   const request = event.request;
   const url = new URL(request.url);
 
+  // Ne jamais intercepter Google Apps Script ou un autre domaine.
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request, { cache: "no-store" })
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put("./index.html", copy));
-          return response;
-        })
         .catch(() => caches.match("./index.html"))
     );
     return;
