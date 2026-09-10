@@ -487,7 +487,11 @@ function afficher(cartes){
         <div style="flex:1">
           <div style="font-size:22px;font-weight:900">${safe(c.pseudo)}</div>
           <div style="color:#d0a15a;font-weight:900">${safe(c.id)}</div>
-          <div style="margin-top:4px;font-size:14px;color:#cbbda7">${safe(c.evenement||"Aucun événement")}</div>
+          <div style="margin-top:7px;font-size:14px;color:#e1cfad;line-height:1.55">
+            ✉️ ${safe(c.email || "Aucun e-mail enregistré")}<br>
+            📲 ${safe(c.telephone || "Aucun téléphone enregistré")}
+          </div>
+          <div style="margin-top:5px;font-size:14px;color:#cbbda7">${safe(c.evenement||"Aucun événement")}</div>
           <div style="font-size:13px;color:#9f927f">${safe(c.dateEvenementFR||"")}</div>
           <div style="margin-top:5px;font-weight:900">${badge}</div>
           <div style="margin-top:5px;font-size:13px;color:#d8b876">
