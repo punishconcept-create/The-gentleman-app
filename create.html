@@ -51,6 +51,28 @@ button{font-family:inherit;cursor:pointer}
 .cardItem{
   padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c
 }
+.modeTabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 20px
+}
+.modeTab{
+  min-height:52px;border-radius:13px;font-size:14px;font-weight:900
+}
+.modeTab.active{
+  background:linear-gradient(#dfb35e,#a86e23);color:#160e05;border:0
+}
+.modeTab:not(.active){
+  background:#17130d;color:#d6ad65;border:1px solid #74501f
+}
+.searchResult{
+  margin-top:10px;padding:14px;border:1px solid #68461d;border-radius:14px;background:#15110c;
+}
+.searchResult .name{font-size:20px;font-weight:900;color:#f5e1bc}
+.searchResult .id{font-size:15px;font-weight:900;color:#d1a259;margin-top:3px}
+.searchResult .meta{font-size:13px;line-height:1.55;color:#b9ab95;margin-top:8px}
+.selectedCard{
+  margin:14px 0;padding:15px;border:1px solid #9b6728;border-radius:15px;background:#15110c
+}
+
 @media(max-width:699px){
   body{padding:14px}
   .wrap{width:100%;max-width:620px;margin:auto;padding:22px 16px 28px}
@@ -74,10 +96,20 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div class="rule"></div>
 
-  <div class="sectionTitle">CRÉER UNE CARTE</div>
-  <div class="sectionDesc">
-    Crée la Gentleman Card du client et active-la pour la date sélectionnée.
+  <div class="modeTabs">
+    <button id="tabCreate" class="modeTab active" type="button" onclick="changerMode('create')">
+      ➕ NOUVELLE CARTE
+    </button>
+    <button id="tabExisting" class="modeTab" type="button" onclick="changerMode('existing')">
+      🔎 CARTE EXISTANTE
+    </button>
   </div>
+
+  <div id="createPanel">
+    <div class="sectionTitle">CRÉER UNE CARTE</div>
+    <div class="sectionDesc">
+      Crée la Gentleman Card du client et active-la pour la date sélectionnée.
+    </div>
 
   <label for="pseudo">PSEUDO DU CLIENT</label>
   <input id="pseudo" type="text" placeholder="Ex : King D">
@@ -121,6 +153,49 @@ button{font-family:inherit;cursor:pointer}
   </button>
 
   <div id="message" class="status" style="display:none"></div>
+  </div>
+
+  <div id="existingPanel" style="display:none">
+    <div class="sectionTitle">CARTE EXISTANTE</div>
+    <div class="sectionDesc">
+      Recherche une Gentleman Card déjà créée puis réactive-la pour l’événement.
+    </div>
+
+    <label for="searchCard">🔎 RECHERCHE</label>
+    <input id="searchCard" type="text" placeholder="N° de carte, pseudo, e-mail ou téléphone">
+
+    <label for="searchPin">🔐 PIN CRÉATION / HÔTESSE</label>
+    <input id="searchPin" type="password" inputmode="numeric" placeholder="PIN CRÉATION">
+
+    <button id="searchBtn" class="action gold" type="button" onclick="rechercherCarteHotesse()">
+      RECHERCHER LA CARTE
+    </button>
+
+    <div id="searchMessage" class="status" style="display:none"></div>
+    <div id="searchResults"></div>
+
+    <div id="reactivatePanel" style="display:none">
+      <div class="rule"></div>
+      <div class="sectionTitle">RÉACTIVER LA CARTE</div>
+
+      <div id="selectedCard" class="selectedCard"></div>
+
+      <label for="reactivateDate">DATE DE L’ÉVÉNEMENT</label>
+      <input id="reactivateDate" type="date">
+
+      <label for="reactivateEmail">✉️ E-MAIL DU CLIENT</label>
+      <input id="reactivateEmail" type="email" placeholder="Ex : client@gmail.com">
+
+      <label for="reactivateTelephone">📲 TÉLÉPHONE DU CLIENT</label>
+      <input id="reactivateTelephone" type="tel" inputmode="tel" placeholder="Ex : 06 12 34 56 78">
+
+      <button id="reactivateBtn" class="action gold" type="button" onclick="reactiverCarteHotesse()">
+        ✅ ACTIVER POUR CET ÉVÉNEMENT
+      </button>
+
+      <div id="reactivateMessage" class="status" style="display:none"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -324,6 +399,182 @@ function bridgeCall(action, fields) {
   });
 }
 
+
+let carteSelectionneeHot = null;
+
+function changerMode(mode){
+  const createPanel=document.getElementById("createPanel");
+  const existingPanel=document.getElementById("existingPanel");
+  const tabCreate=document.getElementById("tabCreate");
+  const tabExisting=document.getElementById("tabExisting");
+
+  const existing=mode==="existing";
+
+  createPanel.style.display=existing ? "none" : "block";
+  existingPanel.style.display=existing ? "block" : "none";
+
+  tabCreate.classList.toggle("active",!existing);
+  tabExisting.classList.toggle("active",existing);
+
+  if(existing){
+    const dateCreate=document.getElementById("dateEvenement").value;
+    if(dateCreate && !document.getElementById("reactivateDate").value){
+      document.getElementById("reactivateDate").value=dateCreate;
+    }
+  }
+}
+
+function showSearchMessage(text){
+  const el=document.getElementById("searchMessage");
+  el.style.display="block";
+  el.textContent=text;
+}
+
+async function rechercherCarteHotesse(){
+  const recherche=document.getElementById("searchCard").value.trim();
+  const pin=document.getElementById("searchPin").value.trim();
+  const btn=document.getElementById("searchBtn");
+
+  if(recherche.length<2) return showSearchMessage("❌ Saisis au moins 2 caractères.");
+  if(!pin) return showSearchMessage("❌ Saisis le PIN création / hôtesse.");
+
+  btn.disabled=true;
+  btn.textContent="RECHERCHE…";
+  showSearchMessage("⏳ Recherche en cours…");
+
+  const data=await bridgeCall("hostessSearch",{
+    recherche,
+    pinCreation:pin
+  });
+
+  btn.disabled=false;
+  btn.textContent="RECHERCHER LA CARTE";
+
+  const results=document.getElementById("searchResults");
+  results.innerHTML="";
+  document.getElementById("reactivatePanel").style.display="none";
+  carteSelectionneeHot=null;
+
+  if(!data || !data.ok){
+    return showSearchMessage("❌ "+(data ? data.message : "Erreur inconnue"));
+  }
+
+  const cartes=Array.isArray(data.cartes) ? data.cartes : [];
+
+  if(!cartes.length){
+    return showSearchMessage("Aucune Gentleman Card trouvée.");
+  }
+
+  showSearchMessage("✅ "+cartes.length+" carte(s) trouvée(s).");
+
+  cartes.forEach(function(carte){
+    const item=document.createElement("div");
+    item.className="searchResult";
+
+    const etat=carte.evenementActif
+      ? "🟢 Active actuellement"
+      : "⚪ "+(carte.messageEvenement || "Non active");
+
+    item.innerHTML=`
+      <div class="name">${safe(carte.pseudo)}</div>
+      <div class="id">${safe(carte.id)}</div>
+      <div class="meta">
+        ✉️ ${safe(carte.email || "Aucun e-mail enregistré")}<br>
+        📲 ${safe(carte.telephone || "Aucun téléphone enregistré")}<br>
+        ${carte.evenement ? "Dernier événement : "+safe(carte.evenement)+"<br>" : ""}
+        ${carte.dateEvenementFR ? "📅 "+safe(carte.dateEvenementFR)+"<br>" : ""}
+        ${etat}
+      </div>
+      <button class="action dark" type="button">SÉLECTIONNER CETTE CARTE</button>
+    `;
+
+    item.querySelector("button").addEventListener("click",function(){
+      selectionnerCarteHot(carte);
+    });
+
+    results.appendChild(item);
+  });
+}
+
+function selectionnerCarteHot(carte){
+  carteSelectionneeHot=carte;
+
+  const panel=document.getElementById("reactivatePanel");
+  const selected=document.getElementById("selectedCard");
+  const email=document.getElementById("reactivateEmail");
+  const telephone=document.getElementById("reactivateTelephone");
+  const date=document.getElementById("reactivateDate");
+
+  selected.innerHTML=`
+    <div style="font-size:22px;font-weight:900;color:#f5e1bc">${safe(carte.pseudo)}</div>
+    <div style="margin-top:4px;color:#d1a259;font-weight:900">${safe(carte.id)}</div>
+  `;
+
+  email.value=carte.email || "";
+  telephone.value=carte.telephone || "";
+
+  const dateCreate=document.getElementById("dateEvenement").value;
+  if(dateCreate) date.value=dateCreate;
+
+  document.getElementById("reactivateMessage").style.display="none";
+  panel.style.display="block";
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function reactiverCarteHotesse(){
+  if(!carteSelectionneeHot) return;
+
+  const dateEvenement=document.getElementById("reactivateDate").value;
+  const email=document.getElementById("reactivateEmail").value.trim();
+  const telephone=document.getElementById("reactivateTelephone").value.trim();
+  const pin=document.getElementById("searchPin").value.trim();
+  const btn=document.getElementById("reactivateBtn");
+  const msg=document.getElementById("reactivateMessage");
+
+  if(!dateEvenement){
+    msg.style.display="block";
+    msg.textContent="❌ Choisis la date de l’événement.";
+    return;
+  }
+
+  if(!pin){
+    msg.style.display="block";
+    msg.textContent="❌ Saisis le PIN création / hôtesse.";
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent="ACTIVATION EN COURS…";
+  msg.style.display="block";
+  msg.textContent="⏳ Activation en cours…";
+
+  const data=await bridgeCall("hostessReactivate",{
+    cardId:carteSelectionneeHot.id,
+    evenement:"The Gentleman",
+    dateEvenement,
+    email,
+    telephone,
+    pinCreation:pin
+  });
+
+  btn.disabled=false;
+  btn.textContent="✅ ACTIVER POUR CET ÉVÉNEMENT";
+
+  if(!data || !data.ok){
+    msg.textContent="❌ "+(data ? data.message : "Erreur inconnue");
+    return;
+  }
+
+  msg.innerHTML=
+    '<div style="font-weight:900;color:#9fe3a8">✅ CARTE RÉACTIVÉE</div>'+
+    '<div style="margin-top:7px">'+safe(carteSelectionneeHot.pseudo)+' — '+safe(carteSelectionneeHot.id)+'</div>'+
+    '<div style="margin-top:5px">📅 '+safe(data.dateEvenementFR || dateEvenement)+'</div>'+
+    (data.emailAuto && data.emailAuto.ok
+      ? '<div style="margin-top:7px;color:#9fe3a8;font-weight:800">✉️ E-mail envoyé automatiquement au client</div>'
+      : '<div style="margin-top:7px;color:#cbbda5">Aucun e-mail automatique envoyé.</div>');
+}
+
+
 let photoBase64 = "";
 let derniereCarte = null;
 
@@ -411,7 +662,8 @@ async function creerCarte(){
     evenement,
     dateEvenement,
     pinCreation: pinAdmin,
-    email
+    email,
+    telephone
   });
 
   btn.disabled=false;
